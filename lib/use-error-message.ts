@@ -3,7 +3,13 @@
 import { useTranslations } from "next-intl";
 import { ERROR_CODES, type ErrorCode } from "@/lib/errors";
 
-const DEFAULT_ARGS = { max: "", product: "", available: "", feature: "" };
+const DEFAULT_ARGS = {
+  max: "",
+  product: "",
+  available: "",
+  feature: "",
+  error: "",
+};
 
 /** Translate a server error code (+ details) into the current locale. */
 export function useErrorMessage() {

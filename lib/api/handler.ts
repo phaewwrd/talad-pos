@@ -10,6 +10,12 @@ const STATUS: Partial<Record<ErrorCode, number>> = {
   NO_ACTIVE_SHOP: 409,
   NOT_FOUND: 404,
   VALIDATION: 400,
+  SESSION_EXPIRED: 401,
+  PASSWORD_CHANGE_REQUIRED: 403,
+  TWO_FACTOR_REQUIRED: 403,
+  SHOP_SUSPENDED: 423,
+  SHOP_CLOSED: 423,
+  RATE_LIMITED: 429,
 };
 
 /** Route Handler wrapper: JSON body on success, `{ code }` on typed errors. */

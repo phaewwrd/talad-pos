@@ -38,6 +38,7 @@
   --color-gold: var(--gold);
   --color-gold-text: var(--gold-text);
   --color-gold-soft: var(--gold-soft);
+  --color-topbar: var(--topbar);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
@@ -90,6 +91,7 @@
   --chart-4: #2e9d5b;
   --chart-5: #e39b16;
   --radius: 0.875rem;
+  --topbar: #111111;
   --sidebar: #111111;
   --sidebar-foreground: #d4d4d4;
   --sidebar-primary: #c9a227;
