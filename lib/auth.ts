@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { admin, organization } from "better-auth/plugins";
+import { admin, organization, twoFactor } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
+import { defaultStatements as platformStatements } from "better-auth/plugins/admin/access";
 import {
   adminAc,
   defaultStatements,
@@ -62,6 +63,25 @@ export const roles = {
   }),
 };
 
+// ---------- Platform (backoffice) roles — Better Auth admin plugin ----------
+// Backoffice accounts are created and changed only by scripts/backoffice/*
+// (server-side calls without an HTTP session). No role is granted
+// user:create / set-role / update / set-password / delete, so none of the
+// /api/auth/admin/* HTTP endpoints can create or elevate an account.
+// app/api/auth/[...all]/route.ts also rejects those paths outright.
+export const platformAc = createAccessControl(platformStatements);
+export const platformRoles = {
+  user: platformAc.newRole({ user: [], session: [] }),
+  support: platformAc.newRole({ user: [], session: [] }),
+  super_admin: platformAc.newRole({
+    user: ["list", "get", "ban", "impersonate"],
+    session: ["list", "revoke"],
+  }),
+};
+
+/** Impersonation sessions last at most 30 minutes. */
+export const IMPERSONATION_SECONDS = 30 * 60;
+
 // ---------- Better Auth ----------
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -70,6 +90,17 @@ export const auth = betterAuth({
   }),
   advanced: {
     database: { generateId: "uuid" }, // matches uuid() columns in auth-schema.ts
+  },
+  user: {
+    additionalFields: {
+      // Set by scripts/backoffice/create-user when it generates a password.
+      mustChangePassword: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+    },
   },
   emailAndPassword: {
     enabled: true,
@@ -109,7 +140,15 @@ export const auth = betterAuth({
         },
       },
     }),
-    admin({ defaultRole: "user", adminRoles: ["admin"] }),
+    admin({
+      ac: platformAc,
+      roles: platformRoles,
+      defaultRole: "user",
+      adminRoles: ["super_admin"],
+      impersonationSessionDuration: IMPERSONATION_SECONDS,
+    }),
+    // Backoffice accounts must enroll TOTP; shop accounts never enable it.
+    twoFactor({ issuer: "Talad POS Backoffice" }),
     pinLogin(),
     nextCookies(), // must stay last
   ],

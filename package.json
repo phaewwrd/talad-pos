@@ -14,8 +14,14 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx --env-file=.env db/seed.ts",
-    "db:baseline": "tsx --env-file=.env db/mark-baseline.ts"
+    "db:seed": "tsx --conditions=react-server --env-file=.env db/seed.ts",
+    "db:baseline": "tsx --env-file=.env db/mark-baseline.ts",
+    "backoffice:create-user": "tsx --conditions=react-server --env-file=.env scripts/backoffice/create-user.ts",
+    "backoffice:set-role": "tsx --conditions=react-server --env-file=.env scripts/backoffice/set-role.ts",
+    "backoffice:deactivate": "tsx --conditions=react-server --env-file=.env scripts/backoffice/deactivate.ts",
+    "backoffice:reactivate": "tsx --conditions=react-server --env-file=.env scripts/backoffice/reactivate.ts",
+    "backoffice:reset-2fa": "tsx --conditions=react-server --env-file=.env scripts/backoffice/reset-2fa.ts",
+    "backoffice:list": "tsx --conditions=react-server --env-file=.env scripts/backoffice/list.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
