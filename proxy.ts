@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   "/pin",
   "/forgot-password",
   "/reset-password",
+  "/shop-unavailable",
 ];
 
 // Backoffice pages that handle their own (partial) session state.

@@ -5,7 +5,7 @@ import { setSessionCookie } from "better-auth/cookies";
 import { and, eq, sql } from "drizzle-orm";
 import * as z from "zod";
 import { db } from "@/db";
-import { member, staffCredentials } from "@/db/schema";
+import { member, shopStatus, staffCredentials } from "@/db/schema";
 import { DEVICE_COOKIE, findTrustedDevice, touchDevice } from "@/lib/devices";
 import type { ErrorCode } from "@/lib/errors";
 
@@ -49,6 +49,17 @@ export const pinLogin = () =>
             ctx.getCookie(DEVICE_COOKIE) ?? undefined,
           );
           if (!device) throw fail("DEVICE_NOT_TRUSTED", "FORBIDDEN");
+
+          // Suspended / closed shops (Backoffice) can't sign staff in.
+          const [status] = await db
+            .select({ status: shopStatus.status })
+            .from(shopStatus)
+            .where(eq(shopStatus.organizationId, device.organizationId))
+            .limit(1);
+          if (status?.status === "suspended")
+            throw fail("SHOP_SUSPENDED", "FORBIDDEN");
+          if (status?.status === "closed")
+            throw fail("SHOP_CLOSED", "FORBIDDEN");
 
           const [cred] = await db
             .select()

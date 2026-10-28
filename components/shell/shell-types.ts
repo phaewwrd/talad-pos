@@ -8,4 +8,6 @@ export type ShellSession = {
   shops: { id: string; name: string }[];
   /** Signed in with a staff PIN on a trusted device. */
   isPinSession: boolean;
+  /** A backoffice super_admin is impersonating this owner. */
+  impersonating: boolean;
 };

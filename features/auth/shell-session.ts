@@ -23,6 +23,14 @@ export async function getShellSession(): Promise<ShellSession> {
   try {
     ctx = await requireMember();
   } catch (err) {
+    if (
+      err instanceof AppError &&
+      (err.code === "SHOP_SUSPENDED" || err.code === "SHOP_CLOSED")
+    ) {
+      redirect(
+        `/${await rootLocale()}/shop-unavailable?reason=${err.code === "SHOP_CLOSED" ? "closed" : "suspended"}`,
+      );
+    }
     if (err instanceof AppError && err.code === "NO_ACTIVE_SHOP") {
       const session = await getAuthSession();
       if (isBackofficeRole(session?.user.role))
@@ -45,6 +53,7 @@ export async function getShellSession(): Promise<ShellSession> {
     .orderBy(asc(member.createdAt));
 
   const active = shops.find((s) => s.id === ctx.organizationId);
+  const authSession = await getAuthSession();
 
   return {
     user: { id: ctx.user.id, name: ctx.user.name, image: ctx.user.image },
@@ -56,5 +65,6 @@ export async function getShellSession(): Promise<ShellSession> {
     },
     shops: shops.map((s) => ({ id: s.id, name: s.displayName ?? s.name })),
     isPinSession: ctx.isPinSession,
+    impersonating: !!authSession?.session.impersonatedBy,
   };
 }

@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { db } from "@/db";
-import { member, staffCredentials } from "@/db/schema";
+import { member, shopStatus, staffCredentials } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import {
   assertFeature,
@@ -46,7 +46,11 @@ const loadMember = cache(async (): Promise<MemberContext> => {
   if (!organizationId) throw new AppError("NO_ACTIVE_SHOP");
 
   const [row] = await db
-    .select({ role: member.role, staffActive: staffCredentials.isActive })
+    .select({
+      role: member.role,
+      staffActive: staffCredentials.isActive,
+      shopStatus: shopStatus.status,
+    })
     .from(member)
     .leftJoin(
       staffCredentials,
@@ -55,6 +59,7 @@ const loadMember = cache(async (): Promise<MemberContext> => {
         eq(staffCredentials.organizationId, member.organizationId),
       ),
     )
+    .leftJoin(shopStatus, eq(shopStatus.organizationId, member.organizationId))
     .where(
       and(
         eq(member.organizationId, organizationId),
@@ -71,6 +76,9 @@ const loadMember = cache(async (): Promise<MemberContext> => {
     .sort((a, b) => ROLE_RANK[b] - ROLE_RANK[a])[0];
   if (!row || !role) throw new AppError("FORBIDDEN");
   if (row.staffActive === false) throw new AppError("STAFF_INACTIVE");
+  // Set by the Backoffice; blocks every page, action and route immediately.
+  if (row.shopStatus === "suspended") throw new AppError("SHOP_SUSPENDED");
+  if (row.shopStatus === "closed") throw new AppError("SHOP_CLOSED");
 
   return {
     user: {
