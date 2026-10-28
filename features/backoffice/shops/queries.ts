@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, inArray, max, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, max, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   member,
@@ -276,7 +276,7 @@ async function getOwnerCard(ownerId: string, currentShopId: string) {
     db
       .select({ at: max(session.createdAt) })
       .from(session)
-      .where(eq(session.userId, ownerId)),
+      .where(and(eq(session.userId, ownerId), isNull(session.impersonatedBy))),
   ]);
   if (!owner) return null;
   return {
@@ -441,13 +441,4 @@ export async function shopOwnerId(id: string) {
     .orderBy(asc(member.createdAt))
     .limit(1);
   return row?.userId ?? null;
-}
-
-/** Shop ids owned by any of these users (for the owners page). */
-export async function shopsOwnedBy(userIds: string[]) {
-  if (userIds.length === 0) return [];
-  return db
-    .select({ userId: member.userId, organizationId: member.organizationId })
-    .from(member)
-    .where(and(inArray(member.userId, userIds), eq(member.role, "owner")));
 }
