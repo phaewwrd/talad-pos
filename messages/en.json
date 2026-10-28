@@ -426,5 +426,55 @@
       "delete": "Deleted",
       "restore": "Restored"
     }
+  },
+  "access": {
+    "upgradeTitle": "This feature isn't in your plan",
+    "upgradeDescription": "Contact us to upgrade",
+    "forbiddenTitle": "You don't have access to this page",
+    "forbiddenDescription": "Ask the shop owner if you need access"
+  },
+  "promotions": {
+    "state": {
+      "active": "Active",
+      "scheduled": "Scheduled",
+      "expired": "Expired",
+      "inactive": "Off"
+    },
+    "create": "New promotion",
+    "edit": "Edit promotion",
+    "formDescription": "Promotion details",
+    "name": "Name",
+    "discountType": "Discount type",
+    "percentage": "Percentage (%)",
+    "fixed": "Fixed amount (฿)",
+    "valuePercent": "Percent off",
+    "valueBaht": "Baht off",
+    "minimumType": "Minimum",
+    "minQuantity": "Quantity",
+    "minAmount": "Amount",
+    "minimumQuantity": "Minimum quantity",
+    "minimumAmount": "Minimum amount (฿)",
+    "startAt": "Starts",
+    "endAt": "Ends",
+    "timezoneHint": "Thailand time (Asia/Bangkok)",
+    "targetProducts": "Products",
+    "targetCategories": "Categories",
+    "pickProducts": "Choose products",
+    "pickCategories": "Choose categories",
+    "search": "Search",
+    "noMatch": "No matches",
+    "removeTarget": "Remove {label}",
+    "active": "Active",
+    "save": "Save",
+    "saved": "Promotion saved",
+    "preview": "Preview",
+    "previewText": "Buy {minimum}, get {discount} off",
+    "previewQty": "{count, plural, one {# item} other {# items}}",
+    "previewAmount": "{amount}",
+    "empty": "No promotions here",
+    "usage": "{count, plural, one {Used on # order} other {Used on # orders}}",
+    "delete": "Delete",
+    "deleteTitle": "Delete promotion “{name}”?",
+    "deleteDescription": "Past orders keep their discount snapshot"
   }
 }

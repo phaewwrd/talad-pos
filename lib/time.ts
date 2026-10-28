@@ -27,3 +27,14 @@ export function startOfBangkokDay(date: Date) {
 export function addDays(date: Date, days: number) {
   return new Date(date.getTime() + days * 86_400_000);
 }
+
+/** `YYYY-MM-DDTHH:mm` (datetime-local value) in Asia/Bangkok → instant. */
+export function fromBangkokLocal(value: string) {
+  return new Date(`${value}:00+07:00`);
+}
+
+/** Instant → `YYYY-MM-DDTHH:mm` in Asia/Bangkok (for datetime-local inputs). */
+export function toBangkokLocal(date: Date | string) {
+  const d = new Date(new Date(date).getTime() + 7 * 3_600_000);
+  return d.toISOString().slice(0, 16);
+}

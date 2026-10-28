@@ -426,5 +426,55 @@
       "delete": "ลบออเดอร์",
       "restore": "กู้คืนออเดอร์"
     }
+  },
+  "access": {
+    "upgradeTitle": "ฟีเจอร์นี้ยังไม่รวมในแพ็กเกจของคุณ",
+    "upgradeDescription": "ติดต่อทีมงานเพื่ออัปเกรด",
+    "forbiddenTitle": "คุณไม่มีสิทธิ์เข้าหน้านี้",
+    "forbiddenDescription": "ติดต่อเจ้าของร้านหากต้องการสิทธิ์เพิ่ม"
+  },
+  "promotions": {
+    "state": {
+      "active": "กำลังใช้งาน",
+      "scheduled": "ตั้งเวลาไว้",
+      "expired": "หมดอายุ",
+      "inactive": "ปิดอยู่"
+    },
+    "create": "สร้างโปรโมชัน",
+    "edit": "แก้ไขโปรโมชัน",
+    "formDescription": "รายละเอียดโปรโมชัน",
+    "name": "ชื่อโปรโมชัน",
+    "discountType": "ประเภทส่วนลด",
+    "percentage": "เปอร์เซ็นต์ (%)",
+    "fixed": "จำนวนเงิน (฿)",
+    "valuePercent": "ลดกี่ %",
+    "valueBaht": "ลดกี่บาท",
+    "minimumType": "เงื่อนไขขั้นต่ำ",
+    "minQuantity": "จำนวนชิ้น",
+    "minAmount": "ยอดเงิน",
+    "minimumQuantity": "ซื้อขั้นต่ำ (ชิ้น)",
+    "minimumAmount": "ยอดขั้นต่ำ (บาท)",
+    "startAt": "เริ่ม",
+    "endAt": "สิ้นสุด",
+    "timezoneHint": "เวลาประเทศไทย (Asia/Bangkok)",
+    "targetProducts": "สินค้าที่ร่วมรายการ",
+    "targetCategories": "หมวดหมู่ที่ร่วมรายการ",
+    "pickProducts": "เลือกสินค้า",
+    "pickCategories": "เลือกหมวดหมู่",
+    "search": "ค้นหา",
+    "noMatch": "ไม่พบ",
+    "removeTarget": "เอา {label} ออก",
+    "active": "เปิดใช้งาน",
+    "save": "บันทึก",
+    "saved": "บันทึกโปรโมชันแล้ว",
+    "preview": "ตัวอย่าง",
+    "previewText": "ซื้อครบ {minimum} ลด {discount}",
+    "previewQty": "{count} ชิ้น",
+    "previewAmount": "{amount}",
+    "empty": "ไม่มีโปรโมชันในหมวดนี้",
+    "usage": "ใช้ไปแล้ว {count} ออเดอร์",
+    "delete": "ลบ",
+    "deleteTitle": "ลบโปรโมชัน “{name}”?",
+    "deleteDescription": "ออเดอร์เก่ายังเก็บข้อมูลส่วนลดไว้เหมือนเดิม"
   }
 }
