@@ -1,5 +1,5 @@
 import "server-only";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { AppError, type ErrorCode } from "@/lib/errors";
 
 const STATUS: Partial<Record<ErrorCode, number>> = {
@@ -17,6 +17,8 @@ export function apiRoute<Args extends unknown[]>(
   fn: (...args: Args) => Promise<unknown>,
 ) {
   return async (...args: Args) => {
+    // Session-scoped data: never prerender or cache these responses.
+    await connection();
     try {
       return NextResponse.json(await fn(...args), {
         headers: { "Cache-Control": "no-store" },
