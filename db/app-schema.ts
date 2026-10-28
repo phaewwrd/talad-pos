@@ -64,10 +64,11 @@ export type StockAdjustmentType =
   | "adjust_down"
   | "waste"
   | "sale_return";
+/** `null` = unlimited. */
 export type EntitlementLimits = {
-  maxShops: number;
-  maxStaffPerShop: number;
-  maxProducts: number;
+  maxShops: number | null;
+  maxStaffPerShop: number | null;
+  maxProducts: number | null;
 };
 export type EntitlementFeatures = {
   promotions: boolean;
@@ -630,6 +631,8 @@ export const stockAdjustments = pgTable(
 
 // ---------- Platform level (NOT org-scoped) ----------
 
+export type EmailLocale = "th" | "en";
+
 export const signupInvites = pgTable(
   "signup_invites",
   {
@@ -649,8 +652,53 @@ export const signupInvites = pgTable(
       onDelete: "set null",
     }),
     createdAt: createdAt(),
+    // --- 0002 additions (backoffice) ---
+    lockToEmail: boolean("lock_to_email").notNull().default(true),
+    emailLocale: text("email_locale")
+      .$type<EmailLocale>()
+      .notNull()
+      .default("th"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    sendCount: integer("send_count").notNull().default(0),
+    revokedBy: uuid("revoked_by").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: updatedAt(),
   },
-  (t) => [index("idx_signup_invites_created").on(t.createdAt.desc())],
+  (t) => [
+    index("idx_signup_invites_created").on(t.createdAt.desc()),
+    check(
+      "signup_invites_email_locale_check",
+      sql`${t.emailLocale} IN ('th', 'en')`,
+    ),
+  ],
+);
+
+export type InviteEmailStatus = "queued" | "sent" | "failed";
+
+export const inviteEmailLogs = pgTable(
+  "invite_email_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    inviteId: uuid("invite_id")
+      .notNull()
+      .references(() => signupInvites.id, { onDelete: "cascade" }),
+    toEmail: text("to_email").notNull(),
+    providerMessageId: text("provider_message_id"),
+    status: text("status").$type<InviteEmailStatus>().notNull(),
+    error: text("error"),
+    sentBy: uuid("sent_by").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check(
+      "invite_email_logs_status_check",
+      sql`${t.status} IN ('queued', 'sent', 'failed')`,
+    ),
+    index("idx_invite_email_logs_invite").on(t.inviteId, t.createdAt.desc()),
+  ],
 );
 
 export const ownerEntitlements = pgTable("owner_entitlements", {
@@ -663,7 +711,99 @@ export const ownerEntitlements = pgTable("owner_entitlements", {
     onDelete: "set null",
   }),
   updatedAt: updatedAt(),
+  // --- 0002 addition ---
+  updatedBy: uuid("updated_by").references(() => user.id, {
+    onDelete: "set null",
+  }),
 });
+
+export const SHOP_STATUSES = ["active", "suspended", "closed"] as const;
+export type ShopStatus = (typeof SHOP_STATUSES)[number];
+
+/** Platform-controlled shop state. No row = active. */
+export const shopStatus = pgTable(
+  "shop_status",
+  {
+    organizationId: uuid("organization_id")
+      .primaryKey()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    status: text("status").$type<ShopStatus>().notNull().default("active"),
+    reason: text("reason"),
+    changedBy: uuid("changed_by").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    changedAt: timestamp("changed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    check(
+      "shop_status_status_check",
+      sql`${t.status} IN ('active', 'suspended', 'closed')`,
+    ),
+  ],
+);
+
+export const AUDIT_TARGET_TYPES = [
+  "shop",
+  "user",
+  "invite",
+  "backoffice_user",
+] as const;
+export type AuditTargetType = (typeof AUDIT_TARGET_TYPES)[number];
+
+/**
+ * Append-only: a trigger (migration 0002) rejects UPDATE/DELETE/TRUNCATE.
+ * actor_id has no FK on purpose, so deleting a user never rewrites history.
+ */
+export const platformAuditLogs = pgTable(
+  "platform_audit_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    actorId: uuid("actor_id"),
+    actorLabel: text("actor_label").notNull(),
+    action: text("action").notNull(),
+    targetType: text("target_type").$type<AuditTargetType>().notNull(),
+    targetId: text("target_id").notNull(),
+    reason: text("reason"),
+    before: jsonb("before"),
+    after: jsonb("after"),
+    ip: text("ip"),
+    userAgent: text("user_agent"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check(
+      "platform_audit_logs_target_type_check",
+      sql`${t.targetType} IN ('shop', 'user', 'invite', 'backoffice_user')`,
+    ),
+    index("idx_platform_audit_logs_target").on(
+      t.targetType,
+      t.targetId,
+      t.createdAt.desc(),
+    ),
+    index("idx_platform_audit_logs_actor").on(t.actorId, t.createdAt.desc()),
+    index("idx_platform_audit_logs_created").on(t.createdAt.desc()),
+  ],
+);
+
+/** Backoffice login attempts, for the 5-failures-per-15-minutes rate limit. */
+export const backofficeLoginAttempts = pgTable(
+  "backoffice_login_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull(),
+    success: boolean("success").notNull(),
+    ip: text("ip"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("idx_backoffice_login_attempts_email").on(
+      t.email,
+      t.createdAt.desc(),
+    ),
+  ],
+);
 
 // =====================================================================
 // Relations (for db.query API)

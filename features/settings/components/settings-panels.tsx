@@ -97,6 +97,7 @@ export function StaffPanel({
   const [pin, setPin] = useState("");
   const active = data.staff.filter((s) => s.isActive).length;
   const max = data.entitlements.limits.maxStaffPerShop;
+  const atStaffLimit = max !== null && active >= max;
 
   const form = useAppForm({
     defaultValues: {
@@ -122,17 +123,17 @@ export function StaffPanel({
     <div className="grid max-w-3xl gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-muted-foreground text-sm">
-          {t("staffUsage", { count: active, max })}
+          {t("staffUsage", { count: active, max: max ?? "∞" })}
         </p>
         <Button
           className="ml-auto h-11 rounded-full"
-          disabled={active >= max}
+          disabled={atStaffLimit}
           onClick={() => setAdding(true)}
         >
           <UserPlus className="size-4" /> {t("addStaff")}
         </Button>
       </div>
-      {active >= max && (
+      {atStaffLimit && (
         <p className="rounded-xl bg-gold-soft p-3 text-gold-text text-sm">
           {t("limitReached")}
         </p>
@@ -379,7 +380,7 @@ export function ShopsPanel({ data }: { data: SettingsBundle }) {
   const max = data.entitlements.features.multiShop
     ? data.entitlements.limits.maxShops
     : 1;
-  const atLimit = data.shops.length >= max;
+  const atLimit = max !== null && data.shops.length >= max;
 
   async function switchTo(id: string) {
     await authClient.organization.setActive({ organizationId: id });
@@ -390,7 +391,7 @@ export function ShopsPanel({ data }: { data: SettingsBundle }) {
   return (
     <div className="grid max-w-3xl gap-4">
       <p className="text-muted-foreground text-sm">
-        {t("shopUsage", { count: data.shops.length, max })}
+        {t("shopUsage", { count: data.shops.length, max: max ?? "∞" })}
       </p>
       <ul className="grid gap-2">
         {data.shops.map((s) => (

@@ -22,7 +22,6 @@ const ctxA = {
       multiShop: true,
     },
   },
-  isPlatformAdmin: false,
   isPinSession: false,
 };
 

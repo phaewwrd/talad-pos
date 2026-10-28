@@ -4,7 +4,6 @@ import type { MemberRole } from "@/lib/roles";
 export type ShellSession = {
   user: { id: string; name: string; image: string | null };
   role: MemberRole;
-  isPlatformAdmin: boolean;
   activeShop: { id: string; name: string; logoUrl: string | null };
   shops: { id: string; name: string }[];
   /** Signed in with a staff PIN on a trusted device. */

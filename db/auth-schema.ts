@@ -9,6 +9,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   pgTable,
   text,
   timestamp,
@@ -36,6 +37,10 @@ export const user = pgTable("user", {
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
+  // twoFactor plugin
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  // additionalFields (lib/auth.ts): backoffice accounts created by script
+  mustChangePassword: boolean("must_change_password").notNull().default(false),
 });
 
 export const session = pgTable(
@@ -92,6 +97,26 @@ export const verification = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
+
+// ---------- twoFactor plugin ----------
+export const twoFactor = pgTable(
+  "two_factor",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    verified: boolean("verified").default(true),
+    failedVerificationCount: integer("failed_verification_count").default(0),
+    lockedUntil: timestamp("locked_until"),
+  },
+  (t) => [
+    index("two_factor_secret_idx").on(t.secret),
+    index("two_factor_user_id_idx").on(t.userId),
+  ],
 );
 
 // ---------- Organization plugin (one organization = one shop / tenant) ----------

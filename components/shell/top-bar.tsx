@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Shield, UserRoundCog } from "lucide-react";
+import { Check, ChevronDown, UserRoundCog } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { LocaleSwitcher } from "./locale-switcher";
 import type { ShellSession } from "./shell-types";
@@ -104,13 +104,6 @@ export function TopBar({ session }: { session: ShellSession }) {
             <DropdownMenuLabel className="sm:hidden">
               {user.name} · {tRoles(role)}
             </DropdownMenuLabel>
-            {session.isPlatformAdmin && (
-              <DropdownMenuItem asChild>
-                <Link href="/admin/invites">
-                  <Shield className="size-4" /> {t("admin")}
-                </Link>
-              </DropdownMenuItem>
-            )}
             {session.isPinSession && (
               <DropdownMenuItem onSelect={switchUser}>
                 <UserRoundCog className="size-4" /> {t("switchUser")}

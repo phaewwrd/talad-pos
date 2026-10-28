@@ -14,6 +14,10 @@ import {
 import { createShopTx } from "@/features/shops/create-shop";
 import { auth } from "@/lib/auth";
 import {
+  getInviteStatus,
+  isInviteUsable,
+} from "@/lib/backoffice/invite-status";
+import {
   DEVICE_COOKIE,
   DEVICE_COOKIE_MAX_AGE,
   hashToken,
@@ -21,7 +25,6 @@ import {
 } from "@/lib/devices";
 import { AppError, runAction } from "@/lib/errors";
 import { OWNER, requireMember } from "@/lib/permissions";
-import { inviteStatus } from "./invites";
 import { inviteSignupSchema, trustDeviceSchema } from "./schemas";
 
 /**
@@ -43,10 +46,14 @@ export async function signupWithInvite(raw: unknown) {
         .where(eq(signupInvites.tokenHash, hashToken(input.token)))
         .for("update")
         .limit(1);
-      if (!invite || inviteStatus(invite) !== "active") {
+      if (!invite || !isInviteUsable(getInviteStatus(invite))) {
         throw new AppError("INVITE_INVALID");
       }
-      if (invite.email && invite.email.toLowerCase() !== input.email) {
+      if (
+        invite.lockToEmail &&
+        invite.email &&
+        invite.email.toLowerCase() !== input.email
+      ) {
         throw new AppError("INVITE_EMAIL_MISMATCH");
       }
 

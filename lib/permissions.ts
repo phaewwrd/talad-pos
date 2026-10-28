@@ -19,7 +19,6 @@ export type MemberContext = {
   organizationId: string;
   role: MemberRole;
   entitlements: Entitlements;
-  isPlatformAdmin: boolean;
   isPinSession: boolean;
 };
 
@@ -83,7 +82,6 @@ const loadMember = cache(async (): Promise<MemberContext> => {
     organizationId,
     role,
     entitlements: await getOrganizationEntitlements(organizationId),
-    isPlatformAdmin: session.user.role === "admin",
     isPinSession: row.staffActive !== null,
   };
 });
@@ -97,14 +95,6 @@ export async function requireMember(
   }
   if (options.feature) assertFeature(ctx.entitlements, options.feature);
   return ctx;
-}
-
-/** Platform admin (Better Auth admin plugin, user.role = "admin"). */
-export async function requirePlatformAdmin() {
-  const session = await getAuthSession();
-  if (!session) throw new AppError("UNAUTHORIZED");
-  if (session.user.role !== "admin") throw new AppError("FORBIDDEN");
-  return session.user;
 }
 
 export const OWNER = ["owner"] as const;

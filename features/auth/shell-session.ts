@@ -5,6 +5,7 @@ import { locale as rootLocale } from "next/root-params";
 import type { ShellSession } from "@/components/shell/shell-types";
 import { db } from "@/db";
 import { member, organization, shopSettings } from "@/db/schema";
+import { isBackofficeRole } from "@/lib/backoffice/roles";
 import { AppError } from "@/lib/errors";
 import {
   getAuthSession,
@@ -24,8 +25,8 @@ export async function getShellSession(): Promise<ShellSession> {
   } catch (err) {
     if (err instanceof AppError && err.code === "NO_ACTIVE_SHOP") {
       const session = await getAuthSession();
-      if (session?.user.role === "admin")
-        redirect(`/${await rootLocale()}/admin/invites`);
+      if (isBackofficeRole(session?.user.role))
+        redirect(`/${await rootLocale()}/backoffice`);
     }
     redirect(await loginPath());
   }
@@ -48,7 +49,6 @@ export async function getShellSession(): Promise<ShellSession> {
   return {
     user: { id: ctx.user.id, name: ctx.user.name, image: ctx.user.image },
     role: ctx.role,
-    isPlatformAdmin: ctx.isPlatformAdmin,
     activeShop: {
       id: ctx.organizationId,
       name: active?.displayName ?? active?.name ?? "",

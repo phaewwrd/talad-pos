@@ -15,6 +15,13 @@
       "when": 1793169654945,
       "tag": "0001_pos_extensions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793174637186,
+      "tag": "0002_backoffice",
+      "breakpoints": true
     }
   ]
 }

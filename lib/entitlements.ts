@@ -30,6 +30,7 @@ export const DEFAULT_ENTITLEMENTS: Entitlements = {
   },
 };
 
+/** `null` limits mean unlimited. */
 export function normalizeEntitlements(
   row: Partial<Entitlements> | null | undefined,
 ): Entitlements {
@@ -84,7 +85,7 @@ export async function assertCanCreateShop(userId: string) {
     .from(member)
     .where(and(eq(member.userId, userId), eq(member.role, "owner")));
   const max = ent.features.multiShop ? ent.limits.maxShops : 1;
-  if (value >= max)
+  if (max !== null && value >= max)
     throw new AppError("LIMIT_REACHED", { limit: "maxShops", max });
 }
 
@@ -104,7 +105,7 @@ export async function assertCanAddStaff(
       ),
     );
   const max = ent.limits.maxStaffPerShop;
-  if (value >= max)
+  if (max !== null && value >= max)
     throw new AppError("LIMIT_REACHED", { limit: "maxStaffPerShop", max });
 }
 
@@ -117,6 +118,6 @@ export async function assertCanCreateProduct(
     .from(products)
     .where(eq(products.organizationId, organizationId));
   const max = ent.limits.maxProducts;
-  if (value >= max)
+  if (max !== null && value >= max)
     throw new AppError("LIMIT_REACHED", { limit: "maxProducts", max });
 }
