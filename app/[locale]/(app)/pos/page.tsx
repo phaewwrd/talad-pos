@@ -1,18 +1,13 @@
 import { getTranslations } from "next-intl/server";
-import { EmptyState } from "@/components/common/empty-state";
-import { PageHeader } from "@/components/common/page-header";
+import { PosScreen } from "@/features/pos/components/pos-screen";
+import { requireMember } from "@/lib/permissions";
 
 export async function generateMetadata() {
   const t = await getTranslations("pages.pos");
   return { title: t("title") };
 }
 
-export default async function Page() {
-  const t = await getTranslations();
-  return (
-    <>
-      <PageHeader title={t("pages.pos.title")} />
-      <EmptyState title={t("common.comingSoon")} />
-    </>
-  );
+export default async function PosPage() {
+  const ctx = await requireMember();
+  return <PosScreen orgId={ctx.organizationId} />;
 }
