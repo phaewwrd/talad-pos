@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "Talad POS",
+    "tagline": "ระบบขายหน้าร้านสำหรับร้านอาหารและร้านค้า"
+  },
+  "common": {
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "create": "สร้าง",
+    "search": "ค้นหา",
+    "filter": "ตัวกรอง",
+    "loading": "กำลังโหลด…",
+    "comingSoon": "กำลังพัฒนา",
+    "empty": "ยังไม่มีข้อมูล",
+    "all": "ทั้งหมด",
+    "close": "ปิด",
+    "back": "ย้อนกลับ",
+    "reason": "เหตุผล",
+    "language": "ภาษา",
+    "upgrade": "ติดต่อทีมงานเพื่ออัปเกรด"
+  },
+  "nav": {
+    "pos": "ขายสินค้า",
+    "orders": "ออเดอร์",
+    "products": "สินค้า",
+    "stock": "สต็อก",
+    "promotions": "โปรโมชัน",
+    "sales": "ยอดขาย",
+    "costProfit": "ต้นทุนและกำไร",
+    "settings": "ตั้งค่า",
+    "admin": "ผู้ดูแลระบบ",
+    "logout": "ออกจากระบบ",
+    "switchShop": "เปลี่ยนร้าน",
+    "switchUser": "สลับผู้ใช้",
+    "mainNavigation": "เมนูหลัก",
+    "more": "เพิ่มเติม"
+  },
+  "roles": {
+    "owner": "เจ้าของร้าน",
+    "manager": "ผู้จัดการ",
+    "cashier": "แคชเชียร์",
+    "admin": "ผู้ดูแลระบบ"
+  },
+  "channels": {
+    "storefront": "หน้าร้าน",
+    "shopee": "Shopee",
+    "lineman": "LINE MAN",
+    "grab": "Grab",
+    "other": "อื่น ๆ"
+  },
+  "orderStatus": {
+    "Pending": "รอดำเนินการ",
+    "In Progress": "กำลังทำ",
+    "Ready": "พร้อมส่ง",
+    "Completed": "เสร็จสิ้น",
+    "Cancelled": "ยกเลิก"
+  },
+  "paymentType": {
+    "Paid": "ชำระแล้ว",
+    "Unpaid": "ยังไม่ชำระ"
+  },
+  "paymentMethod": {
+    "cash": "เงินสด",
+    "promptpay": "พร้อมเพย์"
+  },
+  "pages": {
+    "pos": {
+      "title": "สร้างออเดอร์"
+    },
+    "orders": {
+      "title": "ประวัติออเดอร์"
+    },
+    "products": {
+      "title": "สินค้าและหมวดหมู่"
+    },
+    "stock": {
+      "title": "สต็อกสินค้า"
+    },
+    "promotions": {
+      "title": "โปรโมชัน"
+    },
+    "sales": {
+      "title": "รายงานยอดขาย"
+    },
+    "costProfit": {
+      "title": "ต้นทุนและกำไร"
+    },
+    "settings": {
+      "title": "ตั้งค่า"
+    },
+    "admin": {
+      "title": "ผู้ดูแลแพลตฟอร์ม"
+    }
+  },
+  "auth": {
+    "loginTitle": "เข้าสู่ระบบ",
+    "loginSubtitle": "สำหรับเจ้าของร้าน",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "login": "เข้าสู่ระบบ",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "staffPin": "พนักงานเข้าด้วย PIN",
+    "signupTitle": "สมัครเปิดร้าน",
+    "pinTitle": "เลือกพนักงาน",
+    "forgotTitle": "รีเซ็ตรหัสผ่าน",
+    "resetTitle": "ตั้งรหัสผ่านใหม่"
+  },
+  "errors": {
+    "UNAUTHORIZED": "กรุณาเข้าสู่ระบบ",
+    "FORBIDDEN": "คุณไม่มีสิทธิ์ทำรายการนี้",
+    "NO_ACTIVE_SHOP": "ยังไม่ได้เลือกร้าน",
+    "NOT_FOUND": "ไม่พบข้อมูล",
+    "UNKNOWN": "เกิดข้อผิดพลาด กรุณาลองใหม่"
+  }
+}

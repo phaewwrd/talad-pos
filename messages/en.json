@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "Talad POS",
+    "tagline": "Point of sale for restaurants and shops"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading…",
+    "comingSoon": "Coming soon",
+    "empty": "Nothing here yet",
+    "all": "All",
+    "close": "Close",
+    "back": "Back",
+    "reason": "Reason",
+    "language": "Language",
+    "upgrade": "Contact us to upgrade"
+  },
+  "nav": {
+    "pos": "POS",
+    "orders": "Orders",
+    "products": "Products",
+    "stock": "Stock",
+    "promotions": "Promotions",
+    "sales": "Sales",
+    "costProfit": "Cost & Profit",
+    "settings": "Settings",
+    "admin": "Admin",
+    "logout": "Log out",
+    "switchShop": "Switch shop",
+    "switchUser": "Switch user",
+    "mainNavigation": "Main navigation",
+    "more": "More"
+  },
+  "roles": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "cashier": "Cashier",
+    "admin": "Platform admin"
+  },
+  "channels": {
+    "storefront": "Storefront",
+    "shopee": "Shopee",
+    "lineman": "LINE MAN",
+    "grab": "Grab",
+    "other": "Other"
+  },
+  "orderStatus": {
+    "Pending": "Pending",
+    "In Progress": "In Progress",
+    "Ready": "Ready",
+    "Completed": "Completed",
+    "Cancelled": "Cancelled"
+  },
+  "paymentType": {
+    "Paid": "Paid",
+    "Unpaid": "Unpaid"
+  },
+  "paymentMethod": {
+    "cash": "Cash",
+    "promptpay": "PromptPay"
+  },
+  "pages": {
+    "pos": {
+      "title": "Create order"
+    },
+    "orders": {
+      "title": "Order history"
+    },
+    "products": {
+      "title": "Products & categories"
+    },
+    "stock": {
+      "title": "Stock"
+    },
+    "promotions": {
+      "title": "Promotions"
+    },
+    "sales": {
+      "title": "Sales report"
+    },
+    "costProfit": {
+      "title": "Cost & profit"
+    },
+    "settings": {
+      "title": "Settings"
+    },
+    "admin": {
+      "title": "Platform admin"
+    }
+  },
+  "auth": {
+    "loginTitle": "Log in",
+    "loginSubtitle": "For shop owners",
+    "email": "Email",
+    "password": "Password",
+    "login": "Log in",
+    "forgotPassword": "Forgot password?",
+    "staffPin": "Staff PIN login",
+    "signupTitle": "Open your shop",
+    "pinTitle": "Who's working?",
+    "forgotTitle": "Reset password",
+    "resetTitle": "Set a new password"
+  },
+  "errors": {
+    "UNAUTHORIZED": "Please log in",
+    "FORBIDDEN": "You don't have permission to do this",
+    "NO_ACTIVE_SHOP": "No shop selected",
+    "NOT_FOUND": "Not found",
+    "UNKNOWN": "Something went wrong, please try again"
+  }
+}
