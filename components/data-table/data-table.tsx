@@ -159,7 +159,15 @@ export function DataTable<T extends RowData>({
                 <TableRow
                   key={row.id}
                   onClick={
-                    onRowClick ? () => onRowClick(row.original) : undefined
+                    onRowClick
+                      ? (e) => {
+                          // React events bubble through portals (dialogs, menus
+                          // rendered from a cell); only react to real row clicks.
+                          if (!e.currentTarget.contains(e.target as Node))
+                            return;
+                          onRowClick(row.original);
+                        }
+                      : undefined
                   }
                   className={cn(
                     onRowClick && "cursor-pointer",
