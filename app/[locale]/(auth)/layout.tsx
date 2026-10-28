@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: LayoutProps<"/[locale]">) {
         </span>
         <span className="font-semibold text-xl">Talad POS</span>
       </div>
-      <div className="w-full max-w-sm">{children}</div>
+      <div className="w-full max-w-md">{children}</div>
     </div>
   );
 }

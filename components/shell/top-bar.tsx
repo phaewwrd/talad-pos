@@ -28,6 +28,13 @@ export function TopBar({ session }: { session: ShellSession }) {
   const logout = useLogout();
   const { activeShop, shops, user, role } = session;
 
+  // Shift change: end this staff session and go straight back to the PIN pad.
+  async function switchUser() {
+    await authClient.signOut();
+    router.replace("/pin");
+    router.refresh();
+  }
+
   async function switchShop(organizationId: string) {
     if (organizationId === activeShop.id) return;
     await authClient.organization.setActive({ organizationId });
@@ -105,10 +112,8 @@ export function TopBar({ session }: { session: ShellSession }) {
               </DropdownMenuItem>
             )}
             {session.isPinSession && (
-              <DropdownMenuItem asChild>
-                <Link href="/pin">
-                  <UserRoundCog className="size-4" /> {t("switchUser")}
-                </Link>
+              <DropdownMenuItem onSelect={switchUser}>
+                <UserRoundCog className="size-4" /> {t("switchUser")}
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />

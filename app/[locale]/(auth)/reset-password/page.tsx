@@ -1,18 +1,17 @@
 import { getTranslations } from "next-intl/server";
+import { AuthCard } from "@/features/auth/components/auth-card";
+import { ResetPasswordForm } from "@/features/auth/components/reset-password-form";
 
 export async function generateMetadata() {
   const t = await getTranslations("auth");
   return { title: t("resetTitle") };
 }
 
-export default async function Page() {
-  const t = await getTranslations();
+export default async function ResetPasswordPage() {
+  const t = await getTranslations("auth");
   return (
-    <div className="rounded-2xl border bg-card p-6 shadow-card">
-      <h1 className="font-semibold text-xl">{t("auth.resetTitle")}</h1>
-      <p className="mt-2 text-muted-foreground text-sm">
-        {t("common.comingSoon")}
-      </p>
-    </div>
+    <AuthCard title={t("resetTitle")}>
+      <ResetPasswordForm />
+    </AuthCard>
   );
 }

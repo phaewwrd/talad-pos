@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { organization } from "better-auth/plugins";
+import { nextCookies } from "better-auth/next-js";
+import { admin, organization } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
 import {
   adminAc,
@@ -11,15 +12,22 @@ import {
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { pinLogin } from "@/lib/auth/pin-plugin";
+import { sendEmail } from "@/lib/email";
 
 // ---------- POS roles & permissions ----------
+// Mirrors the role table in DOCs.MD §3.3. App code authorizes with
+// requireMember() (lib/permissions.ts); these statements keep Better Auth's
+// own organization endpoints consistent with it.
 export const statement = {
   ...defaultStatements, // organization, member, invitation
   product: ["create", "read", "update", "delete"],
   stock: ["read", "adjust"],
-  order: ["create", "read", "void"],
+  order: ["create", "read", "update", "void", "restore"],
   promotion: ["create", "read", "update", "delete"],
   report: ["read"],
+  costProfit: ["read", "write"],
+  settings: ["read", "update"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -27,9 +35,11 @@ export const ac = createAccessControl(statement);
 const allPos = {
   product: ["create", "read", "update", "delete"],
   stock: ["read", "adjust"],
-  order: ["create", "read", "void"],
+  order: ["create", "read", "update", "void", "restore"],
   promotion: ["create", "read", "update", "delete"],
   report: ["read"],
+  costProfit: ["read", "write"],
+  settings: ["read", "update"],
 } as const;
 
 export const roles = {
@@ -37,10 +47,10 @@ export const roles = {
   admin: ac.newRole({ ...adminAc.statements, ...allPos }),
   manager: ac.newRole({
     ...memberAc.statements,
-    product: ["create", "read", "update"],
+    product: ["create", "read", "update", "delete"],
     stock: ["read", "adjust"],
-    order: ["create", "read", "void"],
-    promotion: ["create", "read", "update"],
+    order: ["create", "read", "update", "void"],
+    promotion: ["create", "read", "update", "delete"],
     report: ["read"],
   }),
   cashier: ac.newRole({
@@ -61,12 +71,32 @@ export const auth = betterAuth({
   advanced: {
     database: { generateId: "uuid" }, // matches uuid() columns in auth-schema.ts
   },
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    // No public sign-up: owners join through invite links (features/auth/actions.ts).
+    disableSignUp: true,
+    minPasswordLength: 8,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Talad POS — reset your password / รีเซ็ตรหัสผ่าน",
+        text: `Reset your password / ตั้งรหัสผ่านใหม่:\n${url}`,
+      });
+    },
+  },
   plugins: [
     organization({
       ac,
       roles,
-      creatorRole: "owner", // whoever signs up a shop owns it
+      creatorRole: "owner",
+      // Shops are created by our own actions so entitlements (maxShops) apply.
+      allowUserToCreateOrganization: false,
+      // Staff are created in Settings → Staff (maxStaffPerShop, PIN login).
+      organizationHooks: {
+        beforeCreateInvitation: async () => {
+          throw new Error("Invitations are disabled; add staff in Settings.");
+        },
+      },
       schema: {
         organization: {
           additionalFields: {
@@ -79,12 +109,17 @@ export const auth = betterAuth({
         },
       },
     }),
+    admin({ defaultRole: "user", adminRoles: ["admin"] }),
+    pinLogin(),
+    nextCookies(), // must stay last
   ],
   databaseHooks: {
     session: {
       create: {
         // On login, auto-select the user's first shop so the POS opens straight away.
+        // PIN logins already set the device's shop.
         before: async (session) => {
+          if (session.activeOrganizationId) return { data: session };
           const [first] = await db
             .select({ organizationId: schema.member.organizationId })
             .from(schema.member)
@@ -103,32 +138,4 @@ export const auth = betterAuth({
   },
 });
 
-// ---------- Helper: use at the top of every POS route / server action ----------
-type Permissions = {
-  [K in keyof typeof statement]?: (typeof statement)[K][number][];
-};
-
-export async function requireShop(headers: Headers, permissions?: Permissions) {
-  const result = await auth.api.getSession({ headers });
-  if (!result) throw new Error("UNAUTHORIZED");
-
-  const organizationId = result.session.activeOrganizationId;
-  if (!organizationId) throw new Error("NO_ACTIVE_SHOP");
-
-  if (permissions) {
-    const { success } = await auth.api.hasPermission({
-      headers,
-      body: { permissions },
-    });
-    if (!success) throw new Error("FORBIDDEN");
-  }
-
-  return { userId: result.user.id, organizationId };
-}
-
-/* Usage:
-  const { organizationId, userId } = await requireShop(req.headers, { order: ["create"] });
-  const list = await db.query.products.findMany({
-    where: (p, { and, eq }) => and(eq(p.organizationId, organizationId), eq(p.isActive, true)),
-  });
-*/
+export type AuthSession = typeof auth.$Infer.Session;
