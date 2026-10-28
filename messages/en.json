@@ -781,7 +781,23 @@
     },
     "dashboard": {
       "title": "Dashboard",
-      "description": "Platform overview"
+      "description": "Platform overview",
+      "shops": "Active shops",
+      "shopsHint": "{suspended} suspended · {closed} closed",
+      "newShops": "New shops this month",
+      "lastMonth": "Last month: {n}",
+      "invites": "Open invites",
+      "invitesHint": "{draft} draft · {sent} sent · {used} used · {expired} expired",
+      "ordersToday": "Platform orders today",
+      "gmvToday": "Platform GMV today",
+      "gmv30d": "GMV, last 30 days",
+      "orders30d": "{n} orders",
+      "dailyGmv": "Daily GMV (30 days)",
+      "dailyNewShops": "New shops per day (30 days)",
+      "nearLimit": "Shops near limits",
+      "expiringInvites": "Invites expiring in 48h",
+      "recentShops": "Recently active shops",
+      "none": "Nothing here"
     },
     "common": {
       "save": "Save",

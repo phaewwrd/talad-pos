@@ -13,11 +13,11 @@ type OwnerRaw = {
   name: string;
   banned: boolean | null;
   ban_reason: string | null;
-  created_at: Date;
+  created_at: string;
   shops: number;
   limits: EntitlementLimits | null;
   features: EntitlementFeatures | null;
-  last_login_at: Date | null;
+  last_login_at: string | null;
   total_count: number;
 };
 
@@ -25,7 +25,7 @@ const SORTS = {
   email: sql`lower(u.email)`,
   name: sql`lower(u.name)`,
   shops: sql`o.shops`,
-  createdAt: sql`u.created_at`,
+  createdAt: sql`created_at`,
   lastLoginAt: sql`last_login_at`,
 } as const;
 
@@ -52,10 +52,11 @@ export async function listOwners(p: OwnerListParams) {
       SELECT user_id, count(*)::int AS shops
       FROM member WHERE role = 'owner' GROUP BY user_id
     )
-    SELECT u.id, u.email, u.name, u.banned, u.ban_reason, u.created_at, o.shops,
+    SELECT u.id, u.email, u.name, u.banned, u.ban_reason,
+      u.created_at AT TIME ZONE 'UTC' AS created_at, o.shops,
       oe.limits, oe.features,
       -- TODO(decision): sessions are deleted on logout; this is the newest live one.
-      (SELECT max(s.created_at) FROM session s
+      (SELECT max(s.created_at) AT TIME ZONE 'UTC' FROM session s
         WHERE s.user_id = u.id AND s.impersonated_by IS NULL) AS last_login_at,
       count(*) OVER ()::int AS total_count
     FROM o

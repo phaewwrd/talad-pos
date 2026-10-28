@@ -47,7 +47,7 @@ const shopBase = sql`
     SELECT
       o.id,
       coalesce(ss.display_name, o.name) AS name,
-      o.created_at,
+      o.created_at AT TIME ZONE 'UTC' AS created_at,
       u.id AS owner_id,
       u.email AS owner_email,
       u.name AS owner_name,
@@ -93,7 +93,7 @@ const shopBase = sql`
 type ShopRowRaw = {
   id: string;
   name: string;
-  created_at: Date;
+  created_at: string;
   owner_id: string | null;
   owner_email: string | null;
   owner_name: string | null;
@@ -104,7 +104,7 @@ type ShopRowRaw = {
   products_used: number;
   orders_30d: number;
   gmv_30d: string;
-  last_order_at: Date | null;
+  last_order_at: string | null;
   near_limit: boolean;
   total_count: number;
 };
@@ -146,8 +146,8 @@ function shopWhere(p: ShopListParams) {
   if (p.nearLimit) parts.push(sql`near_limit`);
   if (p.ownerId) parts.push(sql`owner_id = ${p.ownerId}`);
   const { start, end } = bangkokRange(p.from, p.to);
-  if (start) parts.push(sql`created_at >= ${start}`);
-  if (end) parts.push(sql`created_at < ${end}`);
+  if (start) parts.push(sql`created_at >= ${start.toISOString()}::timestamptz`);
+  if (end) parts.push(sql`created_at < ${end.toISOString()}::timestamptz`);
   if (p.q) {
     const pattern = likePattern(p.q);
     parts.push(sql`(name ILIKE ${pattern} OR owner_email ILIKE ${pattern})`);
