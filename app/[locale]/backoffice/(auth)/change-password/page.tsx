@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { ForbiddenState } from "@/components/common/access-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BackofficeAuthCard } from "@/features/backoffice/auth/components/backoffice-auth-card";
 import { ChangePasswordForm } from "@/features/backoffice/auth/components/change-password-form";
+import { BackofficeForbidden } from "@/features/backoffice/components/backoffice-forbidden";
 import { guardBackofficePage } from "@/lib/backoffice/guard";
 
 export async function generateMetadata() {
@@ -24,6 +24,6 @@ export default async function ChangePasswordPage() {
 
 async function Gate() {
   const r = await guardBackofficePage({ allowStage: "change-password" });
-  if (!r.ok) return <ForbiddenState />;
+  if (!r.ok) return <BackofficeForbidden />;
   return <ChangePasswordForm forced={r.ctx.stage === "change-password"} />;
 }

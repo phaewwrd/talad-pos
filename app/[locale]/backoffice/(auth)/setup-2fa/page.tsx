@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { ForbiddenState } from "@/components/common/access-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BackofficeAuthCard } from "@/features/backoffice/auth/components/backoffice-auth-card";
 import { SetupTwoFactor } from "@/features/backoffice/auth/components/setup-two-factor";
+import { BackofficeForbidden } from "@/features/backoffice/components/backoffice-forbidden";
 import { backofficePath, guardBackofficePage } from "@/lib/backoffice/guard";
 
 export async function generateMetadata() {
@@ -25,7 +25,7 @@ export default async function SetupTwoFactorPage() {
 
 async function Gate() {
   const r = await guardBackofficePage({ allowStage: "setup-2fa" });
-  if (!r.ok) return <ForbiddenState />;
+  if (!r.ok) return <BackofficeForbidden />;
   // Already enrolled: nothing to set up.
   if (r.ctx.stage === "ready") redirect(await backofficePath(""));
   return <SetupTwoFactor />;

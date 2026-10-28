@@ -751,6 +751,33 @@
       "enabled": "Two-factor authentication is on",
       "signedInAs": "Signed in as {email}",
       "logout": "Log out"
+    },
+    "nav": {
+      "label": "Backoffice navigation",
+      "openMenu": "Open menu",
+      "dashboard": "Dashboard",
+      "shops": "Shops",
+      "owners": "Owners",
+      "invites": "Invites",
+      "auditLog": "Audit log",
+      "team": "Team"
+    },
+    "roles": {
+      "super_admin": "Super admin",
+      "support": "Support"
+    },
+    "userMenu": {
+      "open": "Account menu",
+      "changePassword": "Change password",
+      "logout": "Log out"
+    },
+    "forbidden": {
+      "title": "You don't have access to this page",
+      "description": "Ask a super admin if you need this permission."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Platform overview"
     }
   }
 }
