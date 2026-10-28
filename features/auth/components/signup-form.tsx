@@ -11,9 +11,12 @@ import { inviteSignupSchema } from "../schemas";
 export function SignupForm({
   token,
   lockedEmail,
+  suggestedEmail,
 }: {
   token: string;
   lockedEmail: string | null;
+  /** Prefill (editable) when the invite has an email but isn't locked to it. */
+  suggestedEmail?: string | null;
 }) {
   const t = useTranslations("auth");
   const errorMessage = useErrorMessage();
@@ -24,7 +27,7 @@ export function SignupForm({
       token,
       name: "",
       shopName: "",
-      email: lockedEmail ?? "",
+      email: lockedEmail ?? suggestedEmail ?? "",
       password: "",
       confirmPassword: "",
     },

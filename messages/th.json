@@ -199,7 +199,11 @@
     "targetRequired": "เลือกสินค้าหรือหมวดหมู่อย่างน้อย 1 รายการ",
     "passwordMin12": "อย่างน้อย 12 ตัวอักษร",
     "passwordReused": "ต้องไม่ซ้ำกับรหัสผ่านปัจจุบัน",
-    "totp": "กรอกรหัส 6 หลัก"
+    "totp": "กรอกรหัส 6 หลัก",
+    "tooLarge": "มากเกินไป",
+    "expiryMax": "ไม่เกิน 30 วัน",
+    "lockNeedsEmail": "กรอกอีเมลเพื่อล็อกคำเชิญกับอีเมลนี้",
+    "emailRequired": "ต้องมีอีเมลเพื่อส่งคำเชิญ"
   },
   "upload": {
     "choose": "เลือกรูป",
@@ -778,6 +782,138 @@
     "dashboard": {
       "title": "แดชบอร์ด",
       "description": "ภาพรวมแพลตฟอร์ม"
+    },
+    "common": {
+      "save": "บันทึก",
+      "cancel": "ยกเลิก",
+      "reason": "เหตุผล",
+      "unknown": "—"
+    },
+    "table": {
+      "range": "{from}–{to} จาก {total}",
+      "perPage": "แถว",
+      "expand": "แสดงรายละเอียด",
+      "collapse": "ซ่อนรายละเอียด",
+      "from": "ตั้งแต่",
+      "to": "ถึง",
+      "clearDates": "ล้างวันที่",
+      "exportCsv": "ส่งออก CSV"
+    },
+    "limits": {
+      "title": "ขีดจำกัด",
+      "maxShops": "จำนวนร้าน",
+      "maxStaffPerShop": "พนักงานต่อร้าน",
+      "maxProducts": "จำนวนสินค้า",
+      "unlimited": "ไม่จำกัด",
+      "unlimitedFor": "ไม่จำกัด{limit}",
+      "short": "{shops} ร้าน · {staff} พนักงาน · {products} สินค้า"
+    },
+    "featuresTitle": "ฟีเจอร์",
+    "noFeatures": "ไม่มีฟีเจอร์เสริม",
+    "features": {
+      "promotions": "โปรโมชัน",
+      "costProfit": "ต้นทุนและกำไร",
+      "export": "ส่งออกข้อมูล",
+      "platformChannels": "ช่องทางแพลตฟอร์ม",
+      "multiShop": "หลายสาขา"
+    },
+    "inviteStatus": {
+      "draft": "ฉบับร่าง",
+      "sent": "ส่งแล้ว",
+      "used": "ใช้แล้ว",
+      "expired": "หมดอายุ",
+      "revoked": "ยกเลิกแล้ว"
+    },
+    "shopStatus": {
+      "active": "ใช้งาน",
+      "suspended": "ระงับ",
+      "closed": "ปิดแล้ว"
+    },
+    "owners": {
+      "banned": "ถูกระงับ",
+      "active": "ใช้งาน"
+    },
+    "invites": {
+      "title": "คำเชิญสมัครใช้งาน",
+      "description": "เชิญเจ้าของร้านพร้อมกำหนดขีดจำกัดและฟีเจอร์",
+      "create": "สร้างคำเชิญ",
+      "createTitle": "คำเชิญสมัครใช้งานใหม่",
+      "createDescription": "ลิงก์นี้จะสร้างบัญชีเจ้าของร้านและร้านแรกตามแพ็กเกจนี้",
+      "editTitle": "แก้ไขคำเชิญ",
+      "editDescription": "การเปลี่ยนแปลงมีผลกับลิงก์เดิม วันหมดอายุนับใหม่ตั้งแต่วันนี้",
+      "label": "ชื่อเรียก",
+      "labelPlaceholder": "เช่น ร้านกาแฟคุณเอ",
+      "recipient": "ผู้รับ",
+      "recipientEmail": "อีเมลผู้รับ",
+      "locked": "ล็อก",
+      "lockToEmail": "ล็อกกับอีเมลนี้",
+      "lockToEmailHint": "สมัครด้วยลิงก์นี้ได้เฉพาะอีเมลนี้",
+      "expiresInDays": "หมดอายุใน (วัน)",
+      "expiresHint": "1–{max} วัน",
+      "emailLanguage": "ภาษาอีเมล",
+      "language": {
+        "th": "ไทย",
+        "en": "English"
+      },
+      "preset": "แพ็กเกจสำเร็จรูป",
+      "presetHint": "แพ็กเกจช่วยกรอกค่าให้เท่านั้น — ยังแก้ไขได้",
+      "presets": {
+        "starter": "Starter",
+        "standard": "Standard",
+        "unlimited": "Unlimited"
+      },
+      "createAndSend": "สร้างและส่งอีเมล",
+      "createAndCopy": "สร้างและคัดลอกลิงก์",
+      "saved": "อัปเดตคำเชิญแล้ว",
+      "sentTo": "ส่งคำเชิญไปที่ {email} แล้ว",
+      "status": "สถานะ",
+      "plan": "แพ็กเกจ",
+      "sendCount": "ส่งแล้ว",
+      "lastSent": "ส่งล่าสุด",
+      "expires": "หมดอายุ",
+      "createdBy": "สร้างโดย",
+      "createdRange": "สร้างระหว่าง",
+      "usedBy": "ใช้โดย",
+      "searchPlaceholder": "ค้นหาชื่อเรียกหรืออีเมล",
+      "empty": "ไม่พบคำเชิญ",
+      "emptyDescription": "สร้างคำเชิญเพื่อเริ่มต้นใช้งานให้เจ้าของร้านใหม่",
+      "actionsFor": "การทำงานสำหรับ {label}",
+      "send": "ส่งอีเมล",
+      "resend": "ส่งอีเมลอีกครั้ง",
+      "copyLink": "คัดลอกลิงก์",
+      "copyLinkTooltip": "ระบบไม่เก็บลิงก์ไว้ การคัดลอกจึงสร้างลิงก์ใหม่ ลิงก์ก่อนหน้า (รวมถึงในอีเมล) จะใช้ไม่ได้ทันที",
+      "copied": "คัดลอกแล้ว",
+      "linkTitle": "ลิงก์สมัครใช้งาน",
+      "linkDescription": "คัดลอกตอนนี้ — จะไม่แสดงอีก ลิงก์ก่อนหน้าใช้ไม่ได้แล้ว",
+      "edit": "แก้ไข",
+      "deliveryLog": "ประวัติการส่ง",
+      "noDeliveries": "ยังไม่มีการส่งอีเมล",
+      "sentBy": "โดย {name}",
+      "emailStatus": {
+        "queued": "รอส่ง",
+        "sent": "ส่งแล้ว",
+        "failed": "ไม่สำเร็จ"
+      },
+      "revoke": "ยกเลิกคำเชิญ",
+      "revokeTitle": "ยกเลิกคำเชิญ “{label}”?",
+      "revokeDescription": "ลิงก์จะใช้ไม่ได้ทันทีและย้อนกลับไม่ได้",
+      "revoked": "ยกเลิกคำเชิญแล้ว"
+    },
+    "inviteEmail": {
+      "subject": "คำเชิญเปิดร้านบน Talad POS",
+      "preview": "สร้างบัญชีร้านค้า Talad POS ของคุณ",
+      "greeting": "ยินดีต้อนรับสู่ Talad POS",
+      "intro": "ทีมงาน Talad POS ขอเชิญคุณ ({label}) เปิดร้านบน Talad POS — ระบบขายหน้าร้านสำหรับร้านอาหารและร้านค้าปลีกไทย กดปุ่มด้านล่างเพื่อสร้างบัญชีเจ้าของร้านและร้านแรกของคุณ",
+      "planTitle": "แพ็กเกจของคุณ",
+      "unlimited": "ไม่จำกัด",
+      "featuresTitle": "ฟีเจอร์ที่รวมอยู่",
+      "noFeatures": "ระบบขายพื้นฐาน",
+      "cta": "สร้างบัญชีร้านค้า",
+      "expires": "ลิงก์นี้หมดอายุวันที่ {date} (เวลาประเทศไทย)",
+      "linkFallback": "หากกดปุ่มไม่ได้ ให้คัดลอกลิงก์นี้ไปเปิดในเบราว์เซอร์:",
+      "support": "มีคำถาม? ติดต่อเราได้ที่",
+      "ignore": "หากคุณไม่ได้คาดว่าจะได้รับคำเชิญนี้ สามารถเพิกเฉยอีเมลนี้ได้",
+      "footer": "Talad POS · ระบบขายหน้าร้านสำหรับร้านค้าไทย"
     }
   }
 }

@@ -47,5 +47,11 @@ async function InviteGate({
     );
   }
 
-  return <SignupForm token={raw} lockedEmail={invite.email} />;
+  return (
+    <SignupForm
+      token={raw}
+      lockedEmail={invite.lockToEmail ? invite.email : null}
+      suggestedEmail={invite.email}
+    />
+  );
 }

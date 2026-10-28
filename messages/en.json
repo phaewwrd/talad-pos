@@ -199,7 +199,11 @@
     "targetRequired": "Pick at least one product or category",
     "passwordMin12": "At least 12 characters",
     "passwordReused": "Must differ from the current password",
-    "totp": "Enter the 6-digit code"
+    "totp": "Enter the 6-digit code",
+    "tooLarge": "Too large",
+    "expiryMax": "At most 30 days",
+    "lockNeedsEmail": "Enter an email to lock the invite to it",
+    "emailRequired": "An email is required to send the invite"
   },
   "upload": {
     "choose": "Choose image",
@@ -778,6 +782,138 @@
     "dashboard": {
       "title": "Dashboard",
       "description": "Platform overview"
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "reason": "Reason",
+      "unknown": "—"
+    },
+    "table": {
+      "range": "{from}–{to} of {total}",
+      "perPage": "Rows",
+      "expand": "Show details",
+      "collapse": "Hide details",
+      "from": "From",
+      "to": "To",
+      "clearDates": "Clear dates",
+      "exportCsv": "Export CSV"
+    },
+    "limits": {
+      "title": "Limits",
+      "maxShops": "Shops",
+      "maxStaffPerShop": "Staff per shop",
+      "maxProducts": "Products",
+      "unlimited": "Unlimited",
+      "unlimitedFor": "Unlimited {limit}",
+      "short": "{shops} shops · {staff} staff · {products} products"
+    },
+    "featuresTitle": "Features",
+    "noFeatures": "No add-on features",
+    "features": {
+      "promotions": "Promotions",
+      "costProfit": "Cost & profit",
+      "export": "Export",
+      "platformChannels": "Platform channels",
+      "multiShop": "Multi-shop"
+    },
+    "inviteStatus": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "used": "Used",
+      "expired": "Expired",
+      "revoked": "Revoked"
+    },
+    "shopStatus": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "closed": "Closed"
+    },
+    "owners": {
+      "banned": "Banned",
+      "active": "Active"
+    },
+    "invites": {
+      "title": "Signup invites",
+      "description": "Invite shop owners with a plan of limits and features",
+      "create": "Create invite",
+      "createTitle": "New signup invite",
+      "createDescription": "The link creates the owner account and first shop with this plan.",
+      "editTitle": "Edit invite",
+      "editDescription": "Changes apply to the existing link. Expiry restarts from today.",
+      "label": "Label",
+      "labelPlaceholder": "e.g. Khun A's café",
+      "recipient": "Recipient",
+      "recipientEmail": "Recipient email",
+      "locked": "locked",
+      "lockToEmail": "Lock to this email",
+      "lockToEmailHint": "Only this email can sign up with the link",
+      "expiresInDays": "Expires in (days)",
+      "expiresHint": "1–{max} days",
+      "emailLanguage": "Email language",
+      "language": {
+        "th": "ไทย",
+        "en": "English"
+      },
+      "preset": "Plan preset",
+      "presetHint": "Presets only prefill the values below — you can still change them.",
+      "presets": {
+        "starter": "Starter",
+        "standard": "Standard",
+        "unlimited": "Unlimited"
+      },
+      "createAndSend": "Create & send email",
+      "createAndCopy": "Create & copy link",
+      "saved": "Invite updated",
+      "sentTo": "Invite sent to {email}",
+      "status": "Status",
+      "plan": "Plan",
+      "sendCount": "Sends",
+      "lastSent": "Last sent",
+      "expires": "Expires",
+      "createdBy": "Created by",
+      "createdRange": "Created between",
+      "usedBy": "Used by",
+      "searchPlaceholder": "Search label or email",
+      "empty": "No invites match",
+      "emptyDescription": "Create an invite to onboard a new shop owner.",
+      "actionsFor": "Actions for {label}",
+      "send": "Send email",
+      "resend": "Resend email",
+      "copyLink": "Copy link",
+      "copyLinkTooltip": "Links are never stored, so copying issues a new link. The previous link (including any emailed one) stops working.",
+      "copied": "Copied",
+      "linkTitle": "Signup link",
+      "linkDescription": "Copy it now — it won't be shown again. Any earlier link no longer works.",
+      "edit": "Edit",
+      "deliveryLog": "Delivery log",
+      "noDeliveries": "No emails sent yet",
+      "sentBy": "By {name}",
+      "emailStatus": {
+        "queued": "Queued",
+        "sent": "Sent",
+        "failed": "Failed"
+      },
+      "revoke": "Revoke",
+      "revokeTitle": "Revoke invite “{label}”?",
+      "revokeDescription": "The link stops working immediately. This can't be undone.",
+      "revoked": "Invite revoked"
+    },
+    "inviteEmail": {
+      "subject": "You're invited to open your shop on Talad POS",
+      "preview": "Create your Talad POS shop account",
+      "greeting": "Welcome to Talad POS",
+      "intro": "The Talad POS team has invited you ({label}) to open your shop on Talad POS — a point-of-sale system for Thai restaurants and retail shops. Use the button below to create your owner account and your first shop.",
+      "planTitle": "Your plan",
+      "unlimited": "Unlimited",
+      "featuresTitle": "Included features",
+      "noFeatures": "Core POS",
+      "cta": "Create your shop account",
+      "expires": "This link expires on {date} (Bangkok time).",
+      "linkFallback": "If the button doesn't work, copy this link into your browser:",
+      "support": "Questions? Contact us at",
+      "ignore": "If you weren't expecting this invitation, you can ignore this email.",
+      "footer": "Talad POS · Point of sale for Thai shops"
     }
   }
 }
