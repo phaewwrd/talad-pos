@@ -476,5 +476,53 @@
     "delete": "Delete",
     "deleteTitle": "Delete promotion “{name}”?",
     "deleteDescription": "Past orders keep their discount snapshot"
+  },
+  "sales": {
+    "cashierScope": "Showing your own sales for today",
+    "range": "Range",
+    "preset": {
+      "today": "Today",
+      "7d": "7 days",
+      "month": "This month",
+      "custom": "Custom"
+    },
+    "from": "From",
+    "to": "To",
+    "groupBy": "Group by",
+    "group": {
+      "day": "Daily",
+      "week": "Weekly",
+      "month": "Monthly"
+    },
+    "exportLocked": "Export isn't in your plan",
+    "revenue": "Revenue",
+    "orders": "Orders",
+    "aov": "Avg. order",
+    "discounts": "Discounts",
+    "cogs": "COGS (FIFO)",
+    "grossProfit": "Gross profit",
+    "grossProfitHint": "Revenue excl. VAT − COGS",
+    "revenueOverTime": "Revenue over time",
+    "currentPeriod": "This period",
+    "previousPeriod": "Previous period",
+    "noComparison": "No previous data",
+    "vsPrevious": "vs previous",
+    "byChannel": "By channel",
+    "byPayment": "By payment method",
+    "byStaff": "By staff",
+    "topProducts": "Top products",
+    "topCategories": "Top categories",
+    "allShops": "All shops",
+    "shop": "Shop",
+    "total": "Total",
+    "noData": "No data yet",
+    "orderCount": "{count, plural, one {# order} other {# orders}}",
+    "name": "Name",
+    "qty": "Qty",
+    "methods": {
+      "cash": "Cash",
+      "promptpay": "PromptPay",
+      "unpaid": "Unpaid"
+    }
   }
 }

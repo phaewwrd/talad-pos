@@ -476,5 +476,53 @@
     "delete": "ลบ",
     "deleteTitle": "ลบโปรโมชัน “{name}”?",
     "deleteDescription": "ออเดอร์เก่ายังเก็บข้อมูลส่วนลดไว้เหมือนเดิม"
+  },
+  "sales": {
+    "cashierScope": "แสดงเฉพาะยอดขายของคุณวันนี้",
+    "range": "ช่วงเวลา",
+    "preset": {
+      "today": "วันนี้",
+      "7d": "7 วัน",
+      "month": "เดือนนี้",
+      "custom": "กำหนดเอง"
+    },
+    "from": "ตั้งแต่",
+    "to": "ถึง",
+    "groupBy": "จัดกลุ่ม",
+    "group": {
+      "day": "รายวัน",
+      "week": "รายสัปดาห์",
+      "month": "รายเดือน"
+    },
+    "exportLocked": "การส่งออกยังไม่รวมในแพ็กเกจ",
+    "revenue": "ยอดขาย",
+    "orders": "ออเดอร์",
+    "aov": "เฉลี่ยต่อออเดอร์",
+    "discounts": "ส่วนลด",
+    "cogs": "ต้นทุนขาย (FIFO)",
+    "grossProfit": "กำไรขั้นต้น",
+    "grossProfitHint": "ยอดขายไม่รวม VAT − ต้นทุนขาย",
+    "revenueOverTime": "ยอดขายตามช่วงเวลา",
+    "currentPeriod": "ช่วงนี้",
+    "previousPeriod": "ช่วงก่อนหน้า",
+    "noComparison": "ไม่มีข้อมูลช่วงก่อน",
+    "vsPrevious": "เทียบช่วงก่อน",
+    "byChannel": "ตามช่องทาง",
+    "byPayment": "ตามวิธีชำระ",
+    "byStaff": "ตามพนักงาน",
+    "topProducts": "สินค้าขายดี",
+    "topCategories": "หมวดหมู่ขายดี",
+    "allShops": "สรุปทุกสาขา",
+    "shop": "ร้าน",
+    "total": "รวม",
+    "noData": "ยังไม่มีข้อมูล",
+    "orderCount": "{count} ออเดอร์",
+    "name": "ชื่อ",
+    "qty": "จำนวน",
+    "methods": {
+      "cash": "เงินสด",
+      "promptpay": "พร้อมเพย์",
+      "unpaid": "ยังไม่ชำระ"
+    }
   }
 }
