@@ -681,5 +681,12 @@
     "usageShort": "{products} products · {staff} staff · {orders} orders",
     "created": "Created",
     "noShops": "No shops yet"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "Try again, or refresh the page",
+    "retry": "Try again",
+    "notFound": "Page not found",
+    "home": "Back to POS"
   }
 }
