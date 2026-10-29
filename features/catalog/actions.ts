@@ -8,6 +8,7 @@ import { assertCanCreateProduct } from "@/lib/entitlements";
 import { AppError, runAction } from "@/lib/errors";
 import { OWNER_MANAGER, requireMember } from "@/lib/permissions";
 import { uuid } from "@/lib/schemas";
+import { bumpStockVersion, stockChanged } from "@/lib/stock/version";
 import { canSeeCost } from "./queries";
 import {
   categorySchema,
@@ -169,6 +170,8 @@ export async function createProduct(raw: unknown) {
           imageUrl: input.imageUrl,
         })
         .returning({ id: products.id });
+      await bumpStockVersion(db, ctx.organizationId);
+      stockChanged(ctx.organizationId);
       return row;
     } catch (err) {
       if (isUniqueViolation(err, "products_org_sku_key"))
@@ -207,6 +210,8 @@ export async function updateProduct(id: unknown, raw: unknown) {
         )
         .returning({ id: products.id });
       if (!row) throw new AppError("NOT_FOUND");
+      await bumpStockVersion(db, ctx.organizationId);
+      stockChanged(ctx.organizationId);
       return row;
     } catch (err) {
       if (isUniqueViolation(err, "products_org_sku_key"))

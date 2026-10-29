@@ -41,6 +41,7 @@ import {
   syncProductStock,
 } from "@/lib/stock/db";
 import { releaseAllocations } from "@/lib/stock/fifo";
+import { stockChanged } from "@/lib/stock/version";
 import { loadPromotionRules, loadShopPricing } from "./pricing-context";
 import {
   changeStatusSchema,
@@ -334,7 +335,7 @@ export async function createOrder(raw: unknown) {
     const items = mergeItems(input.items);
     const now = new Date();
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const productMap = await lockProducts(
         tx,
         ctx.organizationId,
@@ -435,6 +436,8 @@ export async function createOrder(raw: unknown) {
         changeAmount: payment.changeAmount,
       };
     });
+    stockChanged(ctx.organizationId);
+    return result;
   });
 }
 
@@ -466,7 +469,7 @@ export async function updateOrder(raw: unknown) {
     assertChannel(ctx, input.salesChannel);
     const items = mergeItems(input.items);
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const order = await lockOrder(tx, ctx.organizationId, input.orderId);
       assertCanEdit(ctx, order, input.reason);
       const before = await snapshot(tx, order.id);
@@ -630,6 +633,8 @@ export async function updateOrder(raw: unknown) {
       });
       return { id: order.id, total: calc.total };
     });
+    stockChanged(ctx.organizationId);
+    return result;
   });
 }
 
@@ -642,7 +647,7 @@ export async function changeOrderStatus(raw: unknown) {
     const ctx = await requireMember();
     const input = parse(changeStatusSchema, raw);
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const order = await lockOrder(tx, ctx.organizationId, input.orderId);
       const kind = classifyTransition(order.status, input.status);
       if (kind === "none") return { id: order.id, status: order.status };
@@ -670,6 +675,8 @@ export async function changeOrderStatus(raw: unknown) {
       });
       return { id: order.id, status: input.status };
     });
+    stockChanged(ctx.organizationId);
+    return result;
   });
 }
 
@@ -716,7 +723,7 @@ export async function deleteOrder(raw: unknown) {
     if (!r.success) throw new AppError("REASON_REQUIRED");
     const input = r.data;
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const order = await lockOrder(tx, ctx.organizationId, input.orderId);
       const before = await snapshot(tx, order.id);
       if (order.status !== "Cancelled") await releaseOrderStock(tx, order.id);
@@ -738,6 +745,8 @@ export async function deleteOrder(raw: unknown) {
       });
       return { id: order.id };
     });
+    stockChanged(ctx.organizationId);
+    return result;
   });
 }
 
@@ -748,7 +757,7 @@ export async function restoreOrder(raw: unknown) {
     const r = reasonSchema.pick({ orderId: true }).safeParse(raw);
     if (!r.success) throw new AppError("VALIDATION");
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const order = await lockOrder(tx, ctx.organizationId, r.data.orderId, {
         deleted: true,
       });
@@ -790,5 +799,7 @@ export async function restoreOrder(raw: unknown) {
       });
       return { id: order.id };
     });
+    stockChanged(ctx.organizationId);
+    return result;
   });
 }
