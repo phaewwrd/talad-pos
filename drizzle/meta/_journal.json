@@ -22,6 +22,13 @@
       "when": 1793174637186,
       "tag": "0002_backoffice",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793260193959,
+      "tag": "0003_supplier_links",
+      "breakpoints": true
     }
   ]
 }

@@ -629,6 +629,148 @@ export const stockAdjustments = pgTable(
   ],
 );
 
+/**
+ * Bumped (same transaction) by every stock change, so the public supplier
+ * page can poll "has anything changed?" with one primary-key read.
+ */
+export const shopStockVersions = pgTable("shop_stock_versions", {
+  organizationId: uuid("organization_id")
+    .primaryKey()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  version: integer("version").notNull().default(0),
+  updatedAt: updatedAt(),
+});
+
+// =====================================================================
+// Suppliers & public stock links
+// =====================================================================
+
+export const SUPPLIER_DISPLAY_MODES = ["QUANTITY", "STATUS"] as const;
+export type SupplierDisplayMode = (typeof SUPPLIER_DISPLAY_MODES)[number];
+export const SUPPLIER_ATTEMPT_KINDS = ["pin", "page", "api"] as const;
+export type SupplierAttemptKind = (typeof SUPPLIER_ATTEMPT_KINDS)[number];
+
+export const suppliers = pgTable(
+  "suppliers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: organizationId(),
+    name: text("name").notNull(),
+    contact: text("contact"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique("suppliers_org_name_key").on(t.organizationId, t.name),
+    index("idx_suppliers_org").on(t.organizationId),
+  ],
+);
+
+export const productSuppliers = pgTable(
+  "product_suppliers",
+  {
+    organizationId: organizationId(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    supplierId: uuid("supplier_id")
+      .notNull()
+      .references(() => suppliers.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.supplierId, t.productId] }),
+    index("idx_product_suppliers_product").on(t.productId),
+  ],
+);
+
+/** One share link per supplier. Valid until disabled or regenerated. */
+export const supplierShareLinks = pgTable(
+  "supplier_share_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: organizationId(),
+    supplierId: uuid("supplier_id")
+      .notNull()
+      .references(() => suppliers.id, { onDelete: "cascade" }),
+    // 32 random bytes, base64url. Never derived from ids.
+    token: text("token").notNull().unique(),
+    isEnabled: boolean("is_enabled").notNull().default(false),
+    pinHash: text("pin_hash"),
+    // Part of the unlock-cookie signature: changing it logs out old devices.
+    pinUpdatedAt: timestamp("pin_updated_at", { withTimezone: true }),
+    displayMode: text("display_mode")
+      .$type<SupplierDisplayMode>()
+      .notNull()
+      .default("QUANTITY"),
+    // null = use each product's minimum_stock.
+    lowStockThreshold: integer("low_stock_threshold"),
+    viewCount: integer("view_count").notNull().default(0),
+    lastViewedAt: timestamp("last_viewed_at", { withTimezone: true }),
+    createdAt: createdAt(),
+    regeneratedAt: timestamp("regenerated_at", { withTimezone: true }),
+  },
+  (t) => [
+    unique("supplier_share_links_org_supplier_key").on(
+      t.organizationId,
+      t.supplierId,
+    ),
+    check(
+      "supplier_share_links_display_mode_check",
+      sql`${t.displayMode} IN ('QUANTITY', 'STATUS')`,
+    ),
+    check(
+      "supplier_share_links_low_stock_threshold_check",
+      sql`${t.lowStockThreshold} IS NULL OR ${t.lowStockThreshold} >= 0`,
+    ),
+  ],
+);
+
+/** ip_hash is an HMAC of the IP; the raw IP is never stored. */
+export const supplierLinkViews = pgTable(
+  "supplier_link_views",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    linkId: uuid("link_id")
+      .notNull()
+      .references(() => supplierShareLinks.id, { onDelete: "cascade" }),
+    viewedAt: timestamp("viewed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    ipHash: text("ip_hash").notNull(),
+    userAgent: text("user_agent"),
+  },
+  (t) => [
+    index("idx_supplier_link_views_link_ip").on(
+      t.linkId,
+      t.ipHash,
+      t.viewedAt.desc(),
+    ),
+  ],
+);
+
+/** Fixed-window counters for PIN attempts and request rate limits. */
+export const supplierLinkAttempts = pgTable(
+  "supplier_link_attempts",
+  {
+    linkId: uuid("link_id")
+      .notNull()
+      .references(() => supplierShareLinks.id, { onDelete: "cascade" }),
+    ipHash: text("ip_hash").notNull(),
+    kind: text("kind").$type<SupplierAttemptKind>().notNull(),
+    count: integer("count").notNull().default(0),
+    windowStartedAt: timestamp("window_started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.linkId, t.ipHash, t.kind] }),
+    check(
+      "supplier_link_attempts_kind_check",
+      sql`${t.kind} IN ('pin', 'page', 'api')`,
+    ),
+  ],
+);
+
 // ---------- Platform level (NOT org-scoped) ----------
 
 export type EmailLocale = "th" | "en";

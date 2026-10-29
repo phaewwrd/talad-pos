@@ -12,16 +12,25 @@ import {
   InsufficientStockError,
   type LotAllocation,
 } from "./fifo";
+import { bumpStockVersion } from "./version";
 
-/** products.stock_quantity := Σ lots.remaining_quantity (same transaction). */
+/**
+ * products.stock_quantity := Σ lots.remaining_quantity, and bump the shop's
+ * stock version (same transaction). Callers still call stockChanged() after
+ * commit to expire the supplier-stock cache.
+ */
 export async function syncProductStock(tx: Tx, productIds: string[]) {
   if (productIds.length === 0) return;
-  await tx
+  const rows = await tx
     .update(products)
     .set({
       stockQuantity: sql`(SELECT COALESCE(SUM(${productStockLots.remainingQuantity}), 0) FROM ${productStockLots} WHERE ${productStockLots.productId} = ${products.id})`,
     })
-    .where(inArray(products.id, [...new Set(productIds)]));
+    .where(inArray(products.id, [...new Set(productIds)]))
+    .returning({ organizationId: products.organizationId });
+  for (const organizationId of new Set(rows.map((r) => r.organizationId))) {
+    await bumpStockVersion(tx, organizationId);
+  }
 }
 
 /** Lock a product's lots (FIFO order) for the rest of the transaction. */
