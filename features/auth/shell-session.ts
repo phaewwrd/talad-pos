@@ -1,43 +1,14 @@
 import "server-only";
 import { asc, eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
-import { locale as rootLocale } from "next/root-params";
 import type { ShellSession } from "@/components/shell/shell-types";
 import { db } from "@/db";
 import { member, organization, shopSettings } from "@/db/schema";
-import { isBackofficeRole } from "@/lib/backoffice/roles";
-import { AppError } from "@/lib/errors";
-import {
-  getAuthSession,
-  type MemberContext,
-  requireMember,
-} from "@/lib/permissions";
-
-async function loginPath() {
-  return `/${await rootLocale()}/login`;
-}
+import { requirePageMember } from "@/lib/page-guard";
+import { getAuthSession } from "@/lib/permissions";
 
 /** The signed-in member for the app chrome; redirects when not usable. */
 export async function getShellSession(): Promise<ShellSession> {
-  let ctx: MemberContext;
-  try {
-    ctx = await requireMember();
-  } catch (err) {
-    if (
-      err instanceof AppError &&
-      (err.code === "SHOP_SUSPENDED" || err.code === "SHOP_CLOSED")
-    ) {
-      redirect(
-        `/${await rootLocale()}/shop-unavailable?reason=${err.code === "SHOP_CLOSED" ? "closed" : "suspended"}`,
-      );
-    }
-    if (err instanceof AppError && err.code === "NO_ACTIVE_SHOP") {
-      const session = await getAuthSession();
-      if (isBackofficeRole(session?.user.role))
-        redirect(`/${await rootLocale()}/backoffice`);
-    }
-    redirect(await loginPath());
-  }
+  const ctx = await requirePageMember();
 
   const shops = await db
     .select({

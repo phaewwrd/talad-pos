@@ -1,5 +1,4 @@
 import "server-only";
-import { deliverEmail } from "./send";
 
 /** Plain-text transactional email (password reset, …). */
 export async function sendEmail(message: {
@@ -7,5 +6,6 @@ export async function sendEmail(message: {
   subject: string;
   text: string;
 }) {
+  const { deliverEmail } = await import("./send");
   await deliverEmail(message);
 }

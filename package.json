@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
+    "@react-email/ui": "6.11.4",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/qrcode": "^1.5.6",
