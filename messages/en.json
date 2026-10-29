@@ -38,7 +38,8 @@
     "switchShop": "Switch shop",
     "switchUser": "Switch user",
     "mainNavigation": "Main navigation",
-    "more": "More"
+    "more": "More",
+    "suppliers": "Suppliers"
   },
   "roles": {
     "owner": "Owner",
@@ -95,6 +96,9 @@
     },
     "admin": {
       "title": "Platform admin"
+    },
+    "suppliers": {
+      "title": "Suppliers"
     }
   },
   "auth": {
@@ -1109,5 +1113,98 @@
   },
   "shopUnavailable": {
     "title": "Shop unavailable"
+  },
+  "suppliers": {
+    "intro": "Share a private link so each supplier can see live stock of the products they supply. No login needed.",
+    "add": "Add supplier",
+    "edit": "Edit supplier",
+    "delete": "Delete",
+    "more": "More actions",
+    "save": "Save",
+    "name": "Supplier name",
+    "contact": "Contact",
+    "contactHint": "Phone, LINE ID or email (optional)",
+    "empty": "No suppliers yet",
+    "emptyHint": "Add a supplier, pick their products, then turn on their stock link.",
+    "created": "Supplier added",
+    "saved": "Saved",
+    "deleted": "Supplier deleted",
+    "deleteTitle": "Delete {name}?",
+    "deleteDescription": "Their stock link stops working immediately. Products are not deleted.",
+    "productCount": "{count, plural, =0 {No products} one {# product} other {# products}}",
+    "productsFor": "Products from {name}",
+    "searchProducts": "Search products",
+    "noProductsFound": "No products found",
+    "selectedCount": "{count} selected",
+    "inactiveProduct": "Inactive",
+    "stockLink": "Stock link",
+    "on": "On",
+    "off": "Off",
+    "pinOn": "PIN",
+    "views": "{count, plural, one {# view} other {# views}}",
+    "lastViewed": "last {time}",
+    "linkUrl": "Supplier link",
+    "copy": "Copy",
+    "copied": "Link copied",
+    "shareLine": "LINE",
+    "shareText": "Stock for {supplier}: {url}",
+    "disabledHint": "The link is off. Suppliers opening it see “link not available”.",
+    "linkEnabled": "Link turned on",
+    "linkDisabled": "Link turned off",
+    "displayMode": "Show suppliers",
+    "modes": {
+      "QUANTITY": "Quantity on hand",
+      "STATUS": "Status only (in stock / low / out)"
+    },
+    "lowThreshold": "Low-stock threshold",
+    "lowThresholdPlaceholder": "Each product's minimum",
+    "thresholdInvalid": "Enter a whole number, or leave empty",
+    "setPin": "Set PIN",
+    "changePin": "Change PIN",
+    "removePin": "Remove PIN",
+    "savePin": "Save PIN",
+    "pin": "PIN",
+    "pinHint": "4–6 digits. Devices that already entered the old PIN must enter the new one.",
+    "pinSaved": "PIN saved",
+    "pinRemoved": "PIN removed",
+    "removePinTitle": "Remove the PIN?",
+    "removePinDescription": "Anyone with the link will be able to see the stock.",
+    "regenerate": "New link",
+    "regenerateTitle": "Create a new link?",
+    "regenerateDescription": "The current link stops working immediately. Send the new link to the supplier. The PIN stays the same.",
+    "regenerated": "New link created"
+  },
+  "supplierView": {
+    "title": "Stock",
+    "heading": "Stock for {supplier}",
+    "search": "Search products",
+    "filter": "Filter",
+    "filters": {
+      "all": "All",
+      "low": "Low",
+      "out": "Out of stock"
+    },
+    "status": {
+      "in": "In stock",
+      "low": "Low",
+      "out": "Out of stock"
+    },
+    "live": "Live",
+    "reconnecting": "Reconnecting…",
+    "updatedJustNow": "updated just now",
+    "updatedAgo": "updated {seconds}s ago",
+    "noProducts": "No products are shared on this link yet",
+    "noMatches": "No products match",
+    "unavailable": "This link is not available",
+    "unavailableHint": "Ask the shop for a new link.",
+    "rateLimited": "Too many requests. Please wait a minute and try again.",
+    "pinTitle": "Enter PIN",
+    "pinHint": "This stock page is protected with a PIN.",
+    "pinSubmit": "Unlock",
+    "pinDelete": "Delete digit",
+    "pinEntered": "{count} digits entered",
+    "pinWrong": "Wrong PIN. {count, plural, one {# try} other {# tries}} left.",
+    "pinWrongGeneric": "Wrong PIN",
+    "pinLocked": "Too many wrong PINs. Try again after {time}."
   }
 }

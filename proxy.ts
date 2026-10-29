@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { backofficeAccess } from "./lib/backoffice/proxy-access";
+import { isSupplierLinkAvailable } from "./lib/suppliers/proxy-access";
 
 const intl = createIntlMiddleware(routing);
 
@@ -59,6 +60,19 @@ export async function proxy(request: NextRequest) {
         }
       }
       return intl(request);
+    }
+
+    // Public supplier stock links: no session needed. Dead links are rewritten
+    // to a static 404 page, since the [token] page streams (status 200).
+    if (rest[0] === "s") {
+      const response = (await isSupplierLinkAvailable(rest[1]))
+        ? intl(request)
+        : NextResponse.rewrite(
+            new URL(`/${maybeLocale}/s/unavailable`, request.url),
+          );
+      response.headers.set("Referrer-Policy", "no-referrer");
+      response.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return response;
     }
 
     if (!matches(subPath, PUBLIC_PATHS) && !getSessionCookie(request)) {

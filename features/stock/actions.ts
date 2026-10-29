@@ -8,6 +8,7 @@ import { AppError, runAction } from "@/lib/errors";
 import { OWNER_MANAGER, requireMember } from "@/lib/permissions";
 import { uuid } from "@/lib/schemas";
 import { syncProductStock } from "@/lib/stock/db";
+import { stockChanged } from "@/lib/stock/version";
 import { suggestLotNumber } from "./queries";
 import { adjustStockSchema, stockInSchema } from "./schemas";
 
@@ -47,7 +48,7 @@ export async function stockIn(raw: unknown) {
     const input = parsed.data;
 
     try {
-      return await db.transaction(async (tx) => {
+      const result = await db.transaction(async (tx) => {
         await lockProduct(tx, ctx.organizationId, input.productId);
         const [lot] = await tx
           .insert(productStockLots)
@@ -73,6 +74,8 @@ export async function stockIn(raw: unknown) {
         await syncProductStock(tx, [input.productId]);
         return { lotId: lot.id };
       });
+      stockChanged(ctx.organizationId);
+      return result;
     } catch (err) {
       if (
         isUniqueViolation(err, "product_stock_lots_product_id_lot_number_key")
@@ -97,7 +100,7 @@ export async function adjustStock(raw: unknown) {
       );
     const input = parsed.data;
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const product = await lockProduct(
         tx,
         ctx.organizationId,
@@ -148,5 +151,7 @@ export async function adjustStock(raw: unknown) {
       await syncProductStock(tx, [input.productId]);
       return { ok: true as const };
     });
+    stockChanged(ctx.organizationId);
+    return result;
   });
 }
