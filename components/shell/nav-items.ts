@@ -8,6 +8,7 @@ import {
   ReceiptText,
   Settings,
   Store,
+  Truck,
 } from "lucide-react";
 import type { MemberRole } from "@/lib/roles";
 
@@ -16,6 +17,7 @@ export type NavKey =
   | "orders"
   | "products"
   | "stock"
+  | "suppliers"
   | "promotions"
   | "sales"
   | "costProfit"
@@ -49,6 +51,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
     primary: true,
   },
   { key: "stock", href: "/stock", icon: Boxes, roles: everyone },
+  {
+    key: "suppliers",
+    href: "/suppliers",
+    icon: Truck,
+    roles: ["owner", "manager"],
+  },
   {
     key: "promotions",
     href: "/promotions",

@@ -38,7 +38,8 @@
     "switchShop": "เปลี่ยนร้าน",
     "switchUser": "สลับผู้ใช้",
     "mainNavigation": "เมนูหลัก",
-    "more": "เพิ่มเติม"
+    "more": "เพิ่มเติม",
+    "suppliers": "ซัพพลายเออร์"
   },
   "roles": {
     "owner": "เจ้าของร้าน",
@@ -95,6 +96,9 @@
     },
     "admin": {
       "title": "ผู้ดูแลแพลตฟอร์ม"
+    },
+    "suppliers": {
+      "title": "ซัพพลายเออร์"
     }
   },
   "auth": {
@@ -1109,5 +1113,98 @@
   },
   "shopUnavailable": {
     "title": "ไม่สามารถใช้งานร้านได้"
+  },
+  "suppliers": {
+    "intro": "แชร์ลิงก์ส่วนตัวให้ซัพพลายเออร์ดูสต็อกสินค้าที่ตนส่งแบบเรียลไทม์ ไม่ต้องล็อกอิน",
+    "add": "เพิ่มซัพพลายเออร์",
+    "edit": "แก้ไขซัพพลายเออร์",
+    "delete": "ลบ",
+    "more": "เพิ่มเติม",
+    "save": "บันทึก",
+    "name": "ชื่อซัพพลายเออร์",
+    "contact": "ช่องทางติดต่อ",
+    "contactHint": "เบอร์โทร, LINE ID หรืออีเมล (ไม่บังคับ)",
+    "empty": "ยังไม่มีซัพพลายเออร์",
+    "emptyHint": "เพิ่มซัพพลายเออร์ เลือกสินค้าที่เขาส่ง แล้วเปิดลิงก์ดูสต็อก",
+    "created": "เพิ่มซัพพลายเออร์แล้ว",
+    "saved": "บันทึกแล้ว",
+    "deleted": "ลบซัพพลายเออร์แล้ว",
+    "deleteTitle": "ลบ {name}?",
+    "deleteDescription": "ลิงก์ดูสต็อกจะใช้ไม่ได้ทันที สินค้าจะไม่ถูกลบ",
+    "productCount": "{count, plural, =0 {ยังไม่มีสินค้า} other {# สินค้า}}",
+    "productsFor": "สินค้าจาก {name}",
+    "searchProducts": "ค้นหาสินค้า",
+    "noProductsFound": "ไม่พบสินค้า",
+    "selectedCount": "เลือกแล้ว {count} รายการ",
+    "inactiveProduct": "ปิดขาย",
+    "stockLink": "ลิงก์ดูสต็อก",
+    "on": "เปิด",
+    "off": "ปิด",
+    "pinOn": "PIN",
+    "views": "เปิดดู {count} ครั้ง",
+    "lastViewed": "ล่าสุด {time}",
+    "linkUrl": "ลิงก์สำหรับซัพพลายเออร์",
+    "copy": "คัดลอก",
+    "copied": "คัดลอกลิงก์แล้ว",
+    "shareLine": "LINE",
+    "shareText": "สต็อกสินค้าของ {supplier}: {url}",
+    "disabledHint": "ลิงก์ปิดอยู่ ผู้ที่เปิดลิงก์จะเห็นข้อความ “ลิงก์นี้ใช้งานไม่ได้”",
+    "linkEnabled": "เปิดลิงก์แล้ว",
+    "linkDisabled": "ปิดลิงก์แล้ว",
+    "displayMode": "แสดงให้ซัพพลายเออร์เห็น",
+    "modes": {
+      "QUANTITY": "จำนวนคงเหลือ",
+      "STATUS": "สถานะเท่านั้น (มีของ / ใกล้หมด / หมด)"
+    },
+    "lowThreshold": "เกณฑ์ใกล้หมด",
+    "lowThresholdPlaceholder": "ใช้ขั้นต่ำของแต่ละสินค้า",
+    "thresholdInvalid": "กรอกจำนวนเต็ม หรือเว้นว่าง",
+    "setPin": "ตั้ง PIN",
+    "changePin": "เปลี่ยน PIN",
+    "removePin": "ลบ PIN",
+    "savePin": "บันทึก PIN",
+    "pin": "PIN",
+    "pinHint": "ตัวเลข 4–6 หลัก อุปกรณ์ที่เคยใส่ PIN เดิมต้องใส่ PIN ใหม่",
+    "pinSaved": "บันทึก PIN แล้ว",
+    "pinRemoved": "ลบ PIN แล้ว",
+    "removePinTitle": "ลบ PIN?",
+    "removePinDescription": "ทุกคนที่มีลิงก์จะดูสต็อกได้ทันที",
+    "regenerate": "สร้างลิงก์ใหม่",
+    "regenerateTitle": "สร้างลิงก์ใหม่?",
+    "regenerateDescription": "ลิงก์เดิมจะใช้ไม่ได้ทันที ส่งลิงก์ใหม่ให้ซัพพลายเออร์ PIN ยังคงเดิม",
+    "regenerated": "สร้างลิงก์ใหม่แล้ว"
+  },
+  "supplierView": {
+    "title": "สต็อกสินค้า",
+    "heading": "สต็อกสินค้าของ {supplier}",
+    "search": "ค้นหาสินค้า",
+    "filter": "ตัวกรอง",
+    "filters": {
+      "all": "ทั้งหมด",
+      "low": "ใกล้หมด",
+      "out": "หมด"
+    },
+    "status": {
+      "in": "มีของ",
+      "low": "ใกล้หมด",
+      "out": "หมด"
+    },
+    "live": "อัปเดตสด",
+    "reconnecting": "กำลังเชื่อมต่อใหม่…",
+    "updatedJustNow": "อัปเดตเมื่อสักครู่",
+    "updatedAgo": "อัปเดต {seconds} วินาทีที่แล้ว",
+    "noProducts": "ยังไม่มีสินค้าในลิงก์นี้",
+    "noMatches": "ไม่พบสินค้า",
+    "unavailable": "ลิงก์นี้ใช้งานไม่ได้",
+    "unavailableHint": "โปรดขอลิงก์ใหม่จากร้านค้า",
+    "rateLimited": "มีการเรียกดูบ่อยเกินไป โปรดรอสักครู่แล้วลองใหม่",
+    "pinTitle": "ใส่ PIN",
+    "pinHint": "หน้านี้ป้องกันด้วย PIN",
+    "pinSubmit": "ปลดล็อก",
+    "pinDelete": "ลบตัวเลข",
+    "pinEntered": "ใส่แล้ว {count} หลัก",
+    "pinWrong": "PIN ไม่ถูกต้อง เหลืออีก {count} ครั้ง",
+    "pinWrongGeneric": "PIN ไม่ถูกต้อง",
+    "pinLocked": "ใส่ PIN ผิดหลายครั้ง ลองใหม่หลังเวลา {time}"
   }
 }
