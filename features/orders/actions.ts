@@ -12,7 +12,6 @@ import {
   sql,
 } from "drizzle-orm";
 import { db, type Tx } from "@/db";
-import type { OrderStatus } from "@/db/app-schema";
 import {
   type OrderAuditAction,
   orderAuditLogs,
@@ -46,7 +45,6 @@ import { releaseAllocations } from "@/lib/stock/fifo";
 import { stockChanged } from "@/lib/stock/version";
 import { loadPromotionRules, loadShopPricing } from "./pricing-context";
 import {
-  bulkChangeStatusSchema,
   changeStatusSchema,
   createOrderSchema,
   type PaymentInput,
@@ -685,45 +683,6 @@ export async function updateOrder(raw: unknown) {
 // Status, payment, delete, restore
 // ---------------------------------------------------------------------------
 
-type StatusChange = { status: OrderStatus; reason?: string };
-
-/**
- * Apply one status change to a locked order. Returns false when there is
- * nothing to do (same status). Throws for invalid / unauthorized transitions.
- */
-async function applyStatusChange(
-  tx: Tx,
-  ctx: MemberContext,
-  order: LockedOrder,
-  input: StatusChange,
-): Promise<boolean> {
-  const kind = classifyTransition(order.status, input.status);
-  if (kind === "none") return false;
-  if (kind === "invalid") throw new AppError("INVALID_STATUS_TRANSITION");
-  if (kind === "backward" || kind === "cancel") {
-    if (ctx.role === "cashier") throw new AppError("FORBIDDEN");
-    if (!input.reason && (kind === "cancel" || ctx.role === "manager")) {
-      throw new AppError("REASON_REQUIRED");
-    }
-  }
-  if (kind === "cancel") await releaseOrderStock(tx, order.id);
-
-  await tx
-    .update(orders)
-    .set({ status: input.status })
-    .where(eq(orders.id, order.id));
-  await audit(tx, {
-    organizationId: ctx.organizationId,
-    orderId: order.id,
-    action: "status_change",
-    actorId: ctx.user.id,
-    reason: input.reason,
-    before: { status: order.status },
-    after: { status: input.status },
-  });
-  return true;
-}
-
 export async function changeOrderStatus(raw: unknown) {
   return runAction(async () => {
     const ctx = await requireMember();
@@ -731,45 +690,31 @@ export async function changeOrderStatus(raw: unknown) {
 
     const result = await db.transaction(async (tx) => {
       const order = await lockOrder(tx, ctx.organizationId, input.orderId);
-      const changed = await applyStatusChange(tx, ctx, order, input);
-      return { id: order.id, status: changed ? input.status : order.status };
-    });
-    stockChanged(ctx.organizationId);
-    return result;
-  });
-}
-
-/**
- * Change many orders to one status in a single transaction (all or nothing).
- * Orders already in the target status are skipped; any invalid transition
- * (e.g. a Cancelled order) rejects the whole batch.
- */
-export async function bulkChangeOrderStatus(raw: unknown) {
-  return runAction(async () => {
-    const ctx = await requireMember();
-    const input = parse(bulkChangeStatusSchema, raw);
-    const ids = [...new Set(input.orderIds)].sort(); // stable lock order
-
-    const result = await db.transaction(async (tx) => {
-      const locked = await tx
-        .select()
-        .from(orders)
-        .where(
-          and(
-            inArray(orders.id, ids),
-            eq(orders.organizationId, ctx.organizationId),
-            isNull(orders.deletedAt),
-          ),
-        )
-        .orderBy(asc(orders.id))
-        .for("update");
-      if (locked.length !== ids.length) throw new AppError("NOT_FOUND");
-
-      let updated = 0;
-      for (const order of locked) {
-        if (await applyStatusChange(tx, ctx, order, input)) updated++;
+      const kind = classifyTransition(order.status, input.status);
+      if (kind === "none") return { id: order.id, status: order.status };
+      if (kind === "invalid") throw new AppError("INVALID_STATUS_TRANSITION");
+      if (kind === "backward" || kind === "cancel") {
+        if (ctx.role === "cashier") throw new AppError("FORBIDDEN");
+        if (!input.reason && (kind === "cancel" || ctx.role === "manager")) {
+          throw new AppError("REASON_REQUIRED");
+        }
       }
-      return { updated, skipped: locked.length - updated };
+      if (kind === "cancel") await releaseOrderStock(tx, order.id);
+
+      await tx
+        .update(orders)
+        .set({ status: input.status })
+        .where(eq(orders.id, order.id));
+      await audit(tx, {
+        organizationId: ctx.organizationId,
+        orderId: order.id,
+        action: "status_change",
+        actorId: ctx.user.id,
+        reason: input.reason,
+        before: { status: order.status },
+        after: { status: input.status },
+      });
+      return { id: order.id, status: input.status };
     });
     stockChanged(ctx.organizationId);
     return result;

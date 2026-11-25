@@ -52,12 +52,6 @@ export const changeStatusSchema = z.object({
   reason: z.string().trim().max(200).optional(),
 });
 
-export const bulkChangeStatusSchema = z.object({
-  orderIds: z.array(uuid).min(1).max(200),
-  status: z.enum(ORDER_STATUSES),
-  reason: z.string().trim().max(200).optional(),
-});
-
 export const takePaymentSchema = z.object({
   orderId: uuid,
   payment: paymentSchema,

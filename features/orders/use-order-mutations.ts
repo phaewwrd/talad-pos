@@ -6,7 +6,6 @@ import type { OrderStatus } from "@/db/app-schema";
 import { type ApiError, unwrap } from "@/lib/api/client";
 import { useErrorMessage } from "@/lib/use-error-message";
 import {
-  bulkChangeOrderStatus,
   changeOrderStatus,
   deleteOrder,
   restoreOrder,
@@ -65,16 +64,6 @@ export function useOrderMutations(orgId: string) {
     onSettled: invalidate,
   });
 
-  const bulkStatus = useMutation({
-    mutationFn: async (v: {
-      orderIds: string[];
-      status: OrderStatus;
-      reason?: string;
-    }) => unwrap(await bulkChangeOrderStatus(v)),
-    onSuccess: invalidate,
-    onError,
-  });
-
   const payment = useMutation({
     mutationFn: async (v: { orderId: string; payment: PaymentInput }) =>
       unwrap(await takePayment(v)),
@@ -99,5 +88,5 @@ export function useOrderMutations(orgId: string) {
     onError,
   });
 
-  return { status, bulkStatus, payment, update, remove, restore };
+  return { status, payment, update, remove, restore };
 }
