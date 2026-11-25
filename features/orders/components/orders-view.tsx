@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { StatusPill } from "@/components/common/status-pill";
 import { type DataColumn, DataTable } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { useOrders } from "../hooks";
 import { type OrderFilters, PAYMENT_METHODS, SALES_CHANNELS } from "../schemas";
 import type { OrderListItemDTO } from "../types";
+import { BulkStatusBar } from "./bulk-status-bar";
 import { OrderActions } from "./order-actions";
 
 const ALL = "__all";
@@ -56,6 +58,26 @@ export function OrdersView({
   const query = useOrders(orgId, { ...filters, q: search.trim() || undefined });
   const showDeleted = filters.deleted === "1";
 
+  // Bulk selection: only live, non-cancelled orders in the current list.
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const selectable = useMemo(
+    () =>
+      showDeleted
+        ? []
+        : (query.data ?? []).filter(
+            (o) => !o.deletedAt && o.status !== "Cancelled",
+          ),
+    [query.data, showDeleted],
+  );
+  // Derived so orders that leave the list (filters, refetch) drop out.
+  const selectedOrders = useMemo(
+    () => selectable.filter((o) => selected.has(o.id)),
+    [selectable, selected],
+  );
+  const allSelected =
+    selectable.length > 0 && selectedOrders.length === selectable.length;
+  const clearSelection = () => setSelected(new Set());
+
   const staffOptions = useMemo(() => {
     const map = new Map<string, string>();
     for (const o of query.data ?? [])
@@ -70,6 +92,59 @@ export function OrdersView({
 
   const columns = useMemo<DataColumn<OrderListItemDTO>[]>(
     () => [
+      ...(showDeleted
+        ? []
+        : [
+            {
+              id: "select",
+              enableSorting: false,
+              meta: { className: "w-10" },
+              header: () => (
+                <Checkbox
+                  aria-label={t("selectAll")}
+                  disabled={selectable.length === 0}
+                  checked={
+                    allSelected
+                      ? true
+                      : selectedOrders.length > 0
+                        ? "indeterminate"
+                        : false
+                  }
+                  onCheckedChange={(v) =>
+                    setSelected(
+                      v === true
+                        ? new Set(selectable.map((o) => o.id))
+                        : new Set(),
+                    )
+                  }
+                />
+              ),
+              cell: ({ row }) => {
+                const o = row.original;
+                const canSelect = !o.deletedAt && o.status !== "Cancelled";
+                return (
+                  // Keep checkbox clicks from opening the order.
+                  // biome-ignore lint/a11y/noStaticElementInteractions: click guard only
+                  // biome-ignore lint/a11y/useKeyWithClickEvents: click guard only
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      aria-label={t("selectOrder", { number: o.orderNumber })}
+                      disabled={!canSelect}
+                      checked={canSelect && selected.has(o.id)}
+                      onCheckedChange={(v) =>
+                        setSelected((prev) => {
+                          const next = new Set(prev);
+                          if (v === true) next.add(o.id);
+                          else next.delete(o.id);
+                          return next;
+                        })
+                      }
+                    />
+                  </div>
+                );
+              },
+            } satisfies DataColumn<OrderListItemDTO>,
+          ]),
       {
         id: "orderNumber",
         accessorFn: (o) => o.orderNumber,
@@ -174,7 +249,22 @@ export function OrdersView({
         ),
       },
     ],
-    [t, tc, tp, tm, money, dateTime, orgId, role, userId, showDeleted],
+    [
+      t,
+      tc,
+      tp,
+      tm,
+      money,
+      dateTime,
+      orgId,
+      role,
+      userId,
+      showDeleted,
+      selectable,
+      selectedOrders.length,
+      allSelected,
+      selected,
+    ],
   );
 
   return (
@@ -265,6 +355,15 @@ export function OrdersView({
           )}
         </div>
       </div>
+      {selectedOrders.length > 0 && (
+        <BulkStatusBar
+          orgId={orgId}
+          role={role}
+          userId={userId}
+          orders={selectedOrders}
+          onClear={clearSelection}
+        />
+      )}
       <DataTable
         columns={columns}
         data={query.data}
