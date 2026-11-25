@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { useMoney } from "@/lib/format";
 
+/** `id`/`orderNumber` are null while the order is still being saved. */
 export type PlacedOrder = {
-  id: string;
-  orderNumber: string;
+  id: string | null;
+  orderNumber: string | null;
   total: string;
   paymentType: "Paid" | "Unpaid";
   changeAmount: string | null;
@@ -39,7 +40,7 @@ export function OrderSuccessDialog({
               <CircleCheck className="size-14 text-success" aria-hidden />
               <DialogTitle className="text-xl">{t("orderPlaced")}</DialogTitle>
               <DialogDescription className="tabular-nums">
-                {order.orderNumber}
+                {order.orderNumber ?? t("savingOrder")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-1 rounded-2xl bg-muted/60 p-4">
@@ -60,6 +61,7 @@ export function OrderSuccessDialog({
               <Button
                 variant="outline"
                 className="h-12 rounded-full"
+                disabled={order.id === null}
                 onClick={() =>
                   window.open(
                     `/${locale}/receipt/${order.id}`,
