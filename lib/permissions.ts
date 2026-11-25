@@ -45,6 +45,9 @@ const loadMember = cache(async (): Promise<MemberContext> => {
   const organizationId = session.session.activeOrganizationId;
   if (!organizationId) throw new AppError("NO_ACTIVE_SHOP");
 
+  // Entitlements only need the org id; fetch them alongside the member row.
+  const entitlementsPromise = getOrganizationEntitlements(organizationId);
+  entitlementsPromise.catch(() => {});
   const [row] = await db
     .select({
       role: member.role,
@@ -89,7 +92,7 @@ const loadMember = cache(async (): Promise<MemberContext> => {
     },
     organizationId,
     role,
-    entitlements: await getOrganizationEntitlements(organizationId),
+    entitlements: await entitlementsPromise,
     isPinSession: row.staffActive !== null,
   };
 });

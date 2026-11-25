@@ -24,7 +24,8 @@ type Action =
   | { type: "channel"; channel: SalesChannel }
   | { type: "togglePromotion"; promotionId: string }
   | { type: "paid"; paid: boolean }
-  | { type: "reset" };
+  | { type: "reset" }
+  | { type: "restore"; state: CartState };
 
 const initial: CartState = {
   quantities: {},
@@ -87,6 +88,9 @@ function reducer(state: CartState, action: Action): CartState {
     case "reset":
       // Keep the channel: cashiers usually stay on the same tab.
       return { ...initial, channel: state.channel };
+    case "restore":
+      // Bring back a cart whose order failed, unless a new one was started.
+      return state.order.length === 0 ? action.state : state;
   }
 }
 
