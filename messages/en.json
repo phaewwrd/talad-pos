@@ -338,6 +338,7 @@
     "placeOrder": "Place order",
     "openCart": "Open cart ({count} items)",
     "orderPlaced": "Order placed",
+    "savingOrder": "Saving order…",
     "changeDue": "Change {amount}",
     "unpaidNote": "Unpaid — take payment later from Orders",
     "printReceipt": "Print receipt",

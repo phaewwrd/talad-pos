@@ -24,6 +24,7 @@ import { useInvalidateOrders } from "@/features/orders/use-order-mutations";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { type ApiError, unwrap } from "@/lib/api/client";
 import { useMoney } from "@/lib/format";
+import { money as toMoney, toMoneyString } from "@/lib/money";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { usePosBootstrap } from "../hooks";
 import { useCart } from "../use-cart";
@@ -60,14 +61,33 @@ export function PosScreen({ orgId }: { orgId: string }) {
           payment,
         }),
       ),
-    onSuccess: (order) => {
+    // Optimistic: clear the cart and show the result from the client preview
+    // right away; the server's numbers replace it when the order is saved.
+    onMutate: (payment) => {
+      const total = cart.preview?.total ?? "0.00";
       setPaying(false);
       setCartOpen(false);
+      setPlaced({
+        id: null,
+        orderNumber: null,
+        total,
+        paymentType: payment ? "Paid" : "Unpaid",
+        changeAmount:
+          payment?.method === "cash"
+            ? toMoneyString(toMoney(payment.cashReceived).minus(total))
+            : null,
+      });
+      const cartState = cart.state;
       cart.dispatch({ type: "reset" });
+      return { cartState };
+    },
+    onSuccess: (order) => {
       setPlaced(order);
       invalidate();
     },
-    onError: (err: ApiError) => {
+    onError: (err: ApiError, _payment, context) => {
+      setPlaced(null);
+      if (context) cart.dispatch({ type: "restore", state: context.cartState });
       toast.error(errorMessage(err.code, err.details));
       // Stock or prices may have changed under us.
       invalidate();

@@ -45,7 +45,7 @@ export const findLink = cache(async (token: string) => {
 /**
  * Raw stock for one supplier's products. Cached per shop stock version (so a
  * newer version is always a cache miss, even on another instance) and tagged
- * so stock-changing Server Actions expire it with updateTag().
+ * so stock-changing Server Actions expire it with stockChanged().
  */
 export async function getSupplierStock(
   organizationId: string,

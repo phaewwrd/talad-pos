@@ -36,6 +36,7 @@ import {
 } from "@/lib/pricing/calculate-order";
 import {
   allocateForItem,
+  allocateForItems,
   loadAllocations,
   returnToLots,
   syncProductStock,
@@ -287,6 +288,15 @@ async function writePromotions(
   calc: CalculatedOrder,
 ) {
   await tx.delete(orderPromotions).where(eq(orderPromotions.orderId, orderId));
+  await insertPromotions(tx, organizationId, orderId, calc);
+}
+
+async function insertPromotions(
+  tx: Tx,
+  organizationId: string,
+  orderId: string,
+  calc: CalculatedOrder,
+) {
   if (calc.promotions.length === 0) return;
   await tx.insert(orderPromotions).values(
     calc.promotions.map((p) => ({
@@ -334,6 +344,14 @@ export async function createOrder(raw: unknown) {
     assertChannel(ctx, input.salesChannel);
     const items = mergeItems(input.items);
     const now = new Date();
+    // Shop settings and promotions don't need the transaction's locks; read
+    // them on other pool connections while the transaction locks products.
+    const context = Promise.all([
+      loadShopPricing(ctx.organizationId),
+      loadPromotionRules(ctx.organizationId, ctx.entitlements, { at: now }),
+    ]);
+    // Avoid an unhandled rejection if the transaction fails before awaiting.
+    context.catch(() => {});
 
     const result = await db.transaction(async (tx) => {
       const productMap = await lockProducts(
@@ -353,15 +371,7 @@ export async function createOrder(raw: unknown) {
         };
       });
 
-      const pricing = await loadShopPricing(ctx.organizationId, tx);
-      const promotions = await loadPromotionRules(
-        ctx.organizationId,
-        ctx.entitlements,
-        {
-          at: now,
-          conn: tx,
-        },
-      );
+      const [pricing, promotions] = await context;
       const calc = calculateOrder({
         lines,
         promotions,
@@ -393,10 +403,11 @@ export async function createOrder(raw: unknown) {
         })
         .returning({ id: orders.id });
 
-      for (const line of calc.lines) {
-        const [item] = await tx
-          .insert(orderItems)
-          .values({
+      // Lines are merged per product, so productId identifies each item.
+      const inserted = await tx
+        .insert(orderItems)
+        .values(
+          calc.lines.map((line) => ({
             organizationId: ctx.organizationId,
             orderId: order.id,
             productId: line.productId,
@@ -405,27 +416,57 @@ export async function createOrder(raw: unknown) {
             unitPrice: line.unitPrice,
             discountAmount: line.discountAmount,
             lineTotal: line.lineTotal,
-          })
-          .returning({ id: orderItems.id });
-        await allocateForItem(tx, {
-          organizationId: ctx.organizationId,
-          orderItemId: item.id,
+          })),
+        )
+        .returning({ id: orderItems.id, productId: orderItems.productId });
+      const itemIds = new Map(inserted.map((i) => [i.productId, i.id]));
+      const lineItems = calc.lines.map((line) => ({
+        id: itemIds.get(line.productId) as string,
+        ...line,
+      }));
+      const allocations = await allocateForItems(
+        tx,
+        ctx.organizationId,
+        lineItems.map((line) => ({
+          orderItemId: line.id,
           productId: line.productId,
           productName: line.productName,
           quantity: line.quantity,
-        });
-      }
-      await writePromotions(tx, ctx.organizationId, order.id, calc);
+        })),
+      );
+      await insertPromotions(tx, ctx.organizationId, order.id, calc);
       await syncProductStock(
         tx,
         items.map((i) => i.productId),
       );
+      // Same shape as snapshot(), built from what was just written.
       await audit(tx, {
         organizationId: ctx.organizationId,
         orderId: order.id,
         action: "create",
         actorId: ctx.user.id,
-        after: await snapshot(tx, order.id),
+        after: {
+          status: "Pending",
+          paymentType: payment.paymentType,
+          paymentMethod: payment.paymentMethod,
+          customerName: input.customerName || "Walk-in",
+          salesChannel: input.salesChannel,
+          subtotal: calc.subtotal,
+          discountTotal: calc.discountTotal,
+          serviceChargeAmount: calc.serviceChargeAmount,
+          vatAmount: calc.vatAmount,
+          total: calc.total,
+          items: lineItems.map((line, i) => ({
+            id: line.id,
+            productId: line.productId,
+            productName: line.productName,
+            quantity: line.quantity,
+            unitPrice: line.unitPrice,
+            discountAmount: line.discountAmount,
+            lineTotal: line.lineTotal,
+            allocations: allocations[i],
+          })),
+        },
       });
 
       return {
@@ -771,15 +812,16 @@ export async function restoreOrder(raw: unknown) {
           ctx.organizationId,
           items.map((i) => i.productId),
         );
-        for (const item of items) {
-          await allocateForItem(tx, {
-            organizationId: ctx.organizationId,
+        await allocateForItems(
+          tx,
+          ctx.organizationId,
+          items.map((item) => ({
             orderItemId: item.id,
             productId: item.productId,
             productName: item.productName,
             quantity: item.quantity,
-          });
-        }
+          })),
+        );
         await syncProductStock(
           tx,
           items.map((i) => i.productId),

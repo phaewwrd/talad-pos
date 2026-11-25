@@ -338,6 +338,7 @@
     "placeOrder": "สั่งออเดอร์",
     "openCart": "เปิดตะกร้า ({count} ชิ้น)",
     "orderPlaced": "สั่งออเดอร์สำเร็จ",
+    "savingOrder": "กำลังบันทึกออเดอร์…",
     "changeDue": "เงินทอน {amount}",
     "unpaidNote": "ยังไม่ชำระ — รับชำระได้ภายหลังที่หน้าออเดอร์",
     "printReceipt": "พิมพ์ใบเสร็จ",

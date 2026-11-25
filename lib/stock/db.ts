@@ -11,6 +11,7 @@ import {
   allocateFifo,
   InsufficientStockError,
   type LotAllocation,
+  mergeAllocations,
 } from "./fifo";
 import { bumpStockVersion } from "./version";
 
@@ -33,74 +34,110 @@ export async function syncProductStock(tx: Tx, productIds: string[]) {
   }
 }
 
-/** Lock a product's lots (FIFO order) for the rest of the transaction. */
-export async function lockLots(
+type AllocationRequest = {
+  orderItemId: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+};
+
+/**
+ * Allocate stock FIFO for several order items at once: lock every lot of
+ * every product in one query, allocate in memory, then decrement lots and
+ * record allocations with one statement each. Throws INSUFFICIENT_STOCK
+ * (localized on the client). Returns allocations in request order.
+ */
+export async function allocateForItems(
   tx: Tx,
   organizationId: string,
-  productId: string,
-) {
-  return tx
+  requests: readonly AllocationRequest[],
+): Promise<LotAllocation[][]> {
+  if (requests.length === 0) return [];
+  const productIds = [...new Set(requests.map((r) => r.productId))].sort();
+  const lots = await tx
     .select({
       id: productStockLots.id,
+      productId: productStockLots.productId,
       stockInDate: productStockLots.stockInDate,
       createdAt: productStockLots.createdAt,
       remainingQuantity: productStockLots.remainingQuantity,
-      cost: productStockLots.cost,
     })
     .from(productStockLots)
     .where(
       and(
         eq(productStockLots.organizationId, organizationId),
-        eq(productStockLots.productId, productId),
+        inArray(productStockLots.productId, productIds),
       ),
     )
-    .orderBy(asc(productStockLots.stockInDate), asc(productStockLots.createdAt))
+    .orderBy(
+      asc(productStockLots.productId),
+      asc(productStockLots.stockInDate),
+      asc(productStockLots.createdAt),
+    )
     .for("update");
+
+  // Remaining quantity per lot, reduced as requests consume it (the same
+  // product may be requested twice, e.g. when restoring an order).
+  const lotsByProduct = new Map<string, (typeof lots)[number][]>();
+  for (const lot of lots) {
+    const list = lotsByProduct.get(lot.productId) ?? [];
+    list.push({ ...lot });
+    lotsByProduct.set(lot.productId, list);
+  }
+
+  const result = requests.map((r) => {
+    const productLots = lotsByProduct.get(r.productId) ?? [];
+    let allocations: LotAllocation[];
+    try {
+      allocations = allocateFifo(r.productId, productLots, r.quantity);
+    } catch (err) {
+      if (err instanceof InsufficientStockError) {
+        throw new AppError("INSUFFICIENT_STOCK", {
+          product: r.productName,
+          available: err.available,
+        });
+      }
+      throw err;
+    }
+    for (const a of allocations) {
+      const lot = productLots.find((l) => l.id === a.lotId);
+      if (lot) lot.remainingQuantity -= a.quantity;
+    }
+    return allocations;
+  });
+
+  const perLot = mergeAllocations(result.flat());
+  await tx.execute(sql`
+    UPDATE ${productStockLots}
+    SET remaining_quantity = ${productStockLots.remainingQuantity} - v.qty,
+        updated_at = now()
+    FROM (VALUES ${sql.join(
+      perLot.map((a) => sql`(${a.lotId}::uuid, ${a.quantity}::int)`),
+      sql`, `,
+    )}) AS v(id, qty)
+    WHERE ${productStockLots.id} = v.id
+  `);
+  await tx.insert(orderItemLotAllocations).values(
+    requests.flatMap((r, i) =>
+      result[i].map((a) => ({
+        organizationId,
+        orderItemId: r.orderItemId,
+        lotId: a.lotId,
+        quantity: a.quantity,
+      })),
+    ),
+  );
+  return result;
 }
 
-/**
- * Allocate `quantity` of a product FIFO for an order item, decrement lots and
- * record allocations. Throws INSUFFICIENT_STOCK (localized on the client).
- */
+/** Allocate stock FIFO for one order item (see allocateForItems). */
 export async function allocateForItem(
   tx: Tx,
-  input: {
-    organizationId: string;
-    orderItemId: string;
-    productId: string;
-    productName: string;
-    quantity: number;
-  },
+  input: AllocationRequest & { organizationId: string },
 ): Promise<LotAllocation[]> {
-  const lots = await lockLots(tx, input.organizationId, input.productId);
-  let allocations: LotAllocation[];
-  try {
-    allocations = allocateFifo(input.productId, lots, input.quantity);
-  } catch (err) {
-    if (err instanceof InsufficientStockError) {
-      throw new AppError("INSUFFICIENT_STOCK", {
-        product: input.productName,
-        available: err.available,
-      });
-    }
-    throw err;
-  }
-  for (const a of allocations) {
-    await tx
-      .update(productStockLots)
-      .set({
-        remainingQuantity: sql`${productStockLots.remainingQuantity} - ${a.quantity}`,
-      })
-      .where(eq(productStockLots.id, a.lotId));
-  }
-  await tx.insert(orderItemLotAllocations).values(
-    allocations.map((a) => ({
-      organizationId: input.organizationId,
-      orderItemId: input.orderItemId,
-      lotId: a.lotId,
-      quantity: a.quantity,
-    })),
-  );
+  const [allocations] = await allocateForItems(tx, input.organizationId, [
+    input,
+  ]);
   return allocations;
 }
 

@@ -1,6 +1,6 @@
 import "server-only";
 import { eq, sql } from "drizzle-orm";
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { type Db, db, type Tx } from "@/db";
 import { shopStockVersions } from "@/db/schema";
 
@@ -28,9 +28,12 @@ export async function getStockVersion(organizationId: string) {
 }
 
 /**
- * Server Actions only: expire the cached supplier stock after a committed
- * stock/catalog/supplier change (the version bump happened in the transaction).
+ * Expire the cached supplier stock after a committed stock/catalog/supplier
+ * change (the version bump happened in the transaction). The cache is keyed
+ * by stock version, so the next read already misses; stale-while-revalidate
+ * is enough and, unlike updateTag(), doesn't make the Server Action re-render
+ * the current route before responding.
  */
 export function stockChanged(organizationId: string) {
-  updateTag(supplierStockTag(organizationId));
+  revalidateTag(supplierStockTag(organizationId), "max");
 }
